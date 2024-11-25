@@ -5,6 +5,17 @@
 #include <array>
 #include <unordered_map>
 
+// Use Cactus Kev's representation for cards:
+//
+// +--------+--------+--------+--------+
+// |xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp|
+// +--------+--------+--------+--------+
+//
+// p = prime number of rank (deuce=2,trey=3,four=5,...,ace=41)
+// r = rank of card (deuce=0,trey=1,four=2,five=3,...,ace=12)
+// cdhs = suit of card (bit turned on based on suit of card)
+// b = bit turned on depending on rank of card
+//
 using u32 = uint32_t;
 
 // Let a_1, a_2, ..., a_7462 be the sequence of distinct hands in No-Limit Texas
@@ -29,6 +40,7 @@ using u32 = uint32_t;
 
 // Namespace for NLHE hand evaluation. The main goal of this namespace is to evaluate
 // a set of five cards, represented as unsigned 32-bit integers.
+//
 namespace Eval {
     constexpr size_t TABLE_SIZE = 7937;
     constexpr u32 CARD_BITMASK = 536805376;
@@ -39,29 +51,37 @@ namespace Eval {
 
     // flushes[b] -> index of flushed hand with bitmask b
     // e.g. if b = 11111, flushes[b] = 9, since b represents a 6-high straight flush
+    //
     extern std::array<int, TABLE_SIZE> flushes;
     // straights_and_high_cards[b] -> index of non-flush hand with bitmask b, or 0 if
     //                                the bitmask does not have 5 bits
     // e.g. if b = 101111, straights_and_high_cards[b] = 7462, since b represents the nut low
+    //
     extern std::array<int, TABLE_SIZE> straights_and_high_cards;
     // primes_to_index[p] -> index of hand with prime product p
     // e.g. if p = 104553157 = 41^4 * 37, primes_to_index[p] = 11, since p represents the
     // hand AAAAK
+    //
     extern std::unordered_map<u32, int> primes_to_index;
 
     // Initialize lookup tables flushes and straights_and_high_cards.
+    //
     void InitLookupTables();
 
     // Initialize lookup map primes_to_index.
+    //
     void InitPrimeToIndex();
 
     // Initialize lookup tables.
+    //
     void Init();
 
     // string -> card
+    //
     u32 parse_card(const std::string s);
 
     // card -> string
+    //
     std::string card_to_string(const u32 card);
 
     // Takes 5 cards represented as u32's and returns the index of the corresponding
@@ -71,6 +91,7 @@ namespace Eval {
     //                    parse_card("Qh"),
     //                    parse_card("Jh"),
     //                    parse_card("Th")}) = 1, since this is a Royal Flush.
+    //
     int EvaluateHand(const u32 cards[5]);
 }
 
