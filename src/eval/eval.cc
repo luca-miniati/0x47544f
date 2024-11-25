@@ -3,34 +3,12 @@
 #include <bit>
 #include <string>
 
-/*
-Let a_1, a_2, ..., a_7462 be the sequence of distinct hands in No-Limit Texas
-Hold 'em, ordered by decreasing strength.
-
-The table shows the indicies of the hands.
-For example, index 1 corresponds to a Royal Flush. Index 11 corresponds to AAAAK.
-
-+-----------------+-------+------+-------+
-|      Hand       | First | Last | Total |
-+-----------------+-------+------+-------+
-| Straight Flush  |     1 |   10 |    10 |
-| Four of a Kind  |    11 |  166 |   156 |
-| Full House      |   167 |  322 |   156 |
-| Flush           |   323 | 1599 |  1277 |
-| Straight        |  1600 | 1609 |    10 |
-| Three of a Kind |  1610 | 2467 |   858 |
-| Two Pair        |  2468 | 3325 |   858 |
-| Pair            |  3326 | 6185 |  2860 |
-| High Card       |  6186 | 7462 |  1277 |
-+-----------------+-------+------+-------+
-
-*/
-
 namespace Eval {
     std::array<int, TABLE_SIZE> flushes = {};
     std::array<int, TABLE_SIZE> straights_and_high_cards = {};
     std::unordered_map<u32, int> primes_to_index;
 
+    // Initialize lookup tables flushes and straights_and_high_cards.
     void InitLookupTables() {
         int contiguous_cnt = 1;
         int non_contiguous_cnt = 1;
@@ -166,7 +144,7 @@ namespace Eval {
         return card;
     }
 
-    std::string card_to_string(u32 card) {
+    std::string card_to_string(const u32 card) {
         std::unordered_map<int, char> rank_index_to_char = {
             {12, 'A'}, {11, 'K'}, {10, 'Q'}, {9, 'J'}, {8, 'T'}, {7, '9'},
             {6, '8'}, {5, '7'}, {4, '6'}, {3, '5'}, {2, '4'}, {1, '3'}, {0, '2'}
@@ -179,7 +157,7 @@ namespace Eval {
         char suit = suit_index_to_char[std::bit_width((card & CARD_SUIT) >> 12) - 1];
         return std::string(1, rank) + suit;
     }
-
+    
     int EvaluateHand(const u32 cards[5]) {
         u32 suit = cards[0]
                  & cards[1]
