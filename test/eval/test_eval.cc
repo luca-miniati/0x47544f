@@ -226,7 +226,13 @@ void test_two_pairs() {
 void test_pairs() {
     u32 cards[5];
 
-    Eval::parse_hand(cards, "");
+    // lowest pair
+    Eval::parse_hand(cards, "2d2h5d4c3c");
+    assert((6185 == Eval::EvaluateHand(cards)) && "eval WA on 2d2h5d4c3c");
+
+    // highest pair
+    Eval::parse_hand(cards, "AdAhKsQcJh");
+    assert((3326 == Eval::EvaluateHand(cards)) && "eval WA on AdAhKsQcJh");
 }
 
 // Test that high cards work.
