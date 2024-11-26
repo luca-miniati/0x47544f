@@ -238,6 +238,14 @@ void test_pairs() {
 // Test that high cards work.
 void test_high_cards() {
     u32 cards[5];
+
+    // lowest high card
+    Eval::parse_hand(cards, "7d5c4s3h2d");
+    assert((7462 == Eval::EvaluateHand(cards)) && "eval WA on 7d5c4s3h2d");
+
+    // highest high card
+    Eval::parse_hand(cards, "AdKhQsJc9h");
+    assert((6186 == Eval::EvaluateHand(cards)) && "eval WA on AdKhQsJc9h");
 }
 
 int main() {
