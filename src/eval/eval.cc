@@ -1,4 +1,5 @@
 #include "eval.h"
+#include <iostream>
 #include <bit>
 #include <string>
 #include <stdexcept>
@@ -68,7 +69,7 @@ namespace Eval {
         int trips_cnt = 1;
         for (int a = 12; a >= 0; --a) {
         for (int b = 12; b >= 0; --b) {
-        for (int c = 12; c >= 0; --c) {
+        for (int c = b - 1; c >= 0; --c) {
             if (a == b || b == c || a == c) continue;
             int p = PRIMES[a];
             int q = PRIMES[b];
@@ -82,7 +83,7 @@ namespace Eval {
         // two pairs
         int two_pairs_cnt = 1;
         for (int a = 12; a >= 0; --a) {
-        for (int b = 12; b >= 0; --b) {
+        for (int b = a - 1; b >= 0; --b) {
         for (int c = 12; c >= 0; --c) {
             if (a == b || b == c || a == c) continue;
             int p = PRIMES[a];
@@ -98,8 +99,8 @@ namespace Eval {
         int pairs_cnt = 1;
         for (int a = 12; a >= 0; --a) {
         for (int b = 12; b >= 0; --b) {
-        for (int c = 12; c >= 0; --c) {
-        for (int d = 12; d >= 0; --d) {
+        for (int c = b - 1; c >= 0; --c) {
+        for (int d = c - 1; d >= 0; --d) {
             if (a == b || a == c || a == d || b == c || b == d || c == d) continue;
             int p = PRIMES[a];
             int q = PRIMES[b];
