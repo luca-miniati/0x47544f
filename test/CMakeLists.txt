@@ -5,7 +5,7 @@ add_executable(
 
 target_link_libraries(
     TestEval
-    PRIVATE
+    PUBLIC
     eval_lib
 )
 
