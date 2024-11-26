@@ -8,11 +8,9 @@
 // Use Cactus Kev's representation for cards:
 //
 // +--------+--------+--------+--------+
-// |xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp|
+// |xxxbbbbb|bbbbbbbb|cdhsxxxx|xxpppppp|
 // +--------+--------+--------+--------+
-//
 // p = prime number of rank (deuce=2,trey=3,four=5,...,ace=41)
-// r = rank of card (deuce=0,trey=1,four=2,five=3,...,ace=12)
 // cdhs = suit of card (bit turned on based on suit of card)
 // b = bit turned on depending on rank of card
 //
@@ -47,6 +45,7 @@ namespace Eval {
     constexpr u32 CARD_SUIT = 61440;
     constexpr u32 CARD_RANK = 3840;
     constexpr u32 CARD_PRIME = 63;
+    //                                      2  3  4  5  6   7   8   9   T   J   Q   K   A
     constexpr std::array<int, 13> PRIMES = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
 
     // flushes[b] -> index of flushed hand with bitmask b
@@ -77,16 +76,22 @@ namespace Eval {
     void Init();
 
     // string -> card
+    // s should be of the form Rs, with R = rank, s = suit.
     //
     u32 parse_card(const std::string s);
 
+    // Populate array of cards with a string of the form RsRsRsRs, with R = rank, s = suit.
+    //
+    void parse_hand(u32 (&cards)[5], std::string h);
+
     // card -> string
+    // returns string of the form Rs, with R = rank, s = suit.
     //
     std::string card_to_string(const u32 card);
 
     // Takes 5 cards represented as u32's and returns the index of the corresponding
     // hand.
-    // e.g. EvaluateHand({parse_card("Ah"), 
+    // e.g. EvaluateHand({parse_card("Ah"),
     //                    parse_card("Kh"),
     //                    parse_card("Qh"),
     //                    parse_card("Jh"),

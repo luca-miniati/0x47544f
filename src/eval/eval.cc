@@ -1,7 +1,7 @@
 #include "eval.h"
-#include <iostream>
 #include <bit>
 #include <string>
+#include <stdexcept>
 
 namespace Eval {
     std::array<int, TABLE_SIZE> flushes = {};
@@ -127,6 +127,13 @@ namespace Eval {
             {'c', 3}, {'d', 2}, {'h', 1}, {'s', 0}
         };
 
+        if (s.length() != 2)
+            throw std::invalid_argument("card must be in the form Rs, where R = rank, s = suit");
+        if (!char_to_rank_index.count(s[0]))
+            throw std::invalid_argument("rank: '" + std::to_string(s[0]) + "' not recognized.");
+        if (!char_to_suit_index.count(s[1]))
+            throw std::invalid_argument("suit: '" + std::to_string(s[0]) + "' not recognized.");
+
         u32 card = 0;
 
         int rank_index = char_to_rank_index[s[0]];
@@ -134,7 +141,7 @@ namespace Eval {
 
         // set bit for rank
         card |= (1 << (rank_index + 16));
-        
+
         // set bits for prime
         card |= PRIMES[rank_index];
 
@@ -142,6 +149,15 @@ namespace Eval {
         card |= (1 << (suit_index + 12));
 
         return card;
+    }
+
+    void parse_hand(u32 (&cards)[5], std::string h) {
+        if (h.length() != 10)
+            throw std::invalid_argument("hand must be in the form RsRsRsRs, where R = rank, s = suit");
+
+        for (int i = 0; i < 5; ++i) {
+            cards[i] = parse_card(h.substr(2 * i, 2));
+        }
     }
 
     std::string card_to_string(const u32 card) {
@@ -155,9 +171,13 @@ namespace Eval {
 
         char rank = rank_index_to_char[std::bit_width(card >> 16) - 1];
         char suit = suit_index_to_char[std::bit_width((card & CARD_SUIT) >> 12) - 1];
+
+        if (!rank || !suit)
+            throw std::invalid_argument("invalid card.");
+
         return std::string(1, rank) + suit;
     }
-    
+
     int EvaluateHand(const u32 cards[5]) {
         u32 suit = cards[0]
                  & cards[1]
@@ -190,17 +210,4 @@ namespace Eval {
 
         return primes_to_index[primes];
     }
-}
-
-int main() {
-    Eval::Init();
-    u32 c1 = Eval::parse_card("Ah");
-    u32 c2 = Eval::parse_card("Kh");
-    u32 c3 = Eval::parse_card("Qh");
-    u32 c4 = Eval::parse_card("Jh");
-    // u32 c5 = Eval::parse_card("Th");
-    u32 c5 = Eval::parse_card("9h");
-    u32 cards[5] = {c1, c2, c3, c4, c5};
-
-    std::cout << Eval::EvaluateHand(cards) << '\n';
 }
