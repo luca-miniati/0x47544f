@@ -226,11 +226,12 @@ void test_two_pairs() {
 void test_pairs() {
     u32 cards[5];
 
-    // lowest pair
     Eval::parse_hand(cards, "2d2h5d4c3c");
     assert((6185 == Eval::EvaluateHand(cards)) && "eval WA on 2d2h5d4c3c");
-
-    // highest pair
+    Eval::parse_hand(cards, "TcAcTh9dKs");
+    assert((4208 == Eval::EvaluateHand(cards)) && "eval WA on TcAcTh9dKs");
+    Eval::parse_hand(cards, "3dTdJs7s3c");
+    assert((5884 == Eval::EvaluateHand(cards)) && "eval WA on 3dTdJs7s3c");
     Eval::parse_hand(cards, "AdAhKsQcJh");
     assert((3326 == Eval::EvaluateHand(cards)) && "eval WA on AdAhKsQcJh");
 }
@@ -239,11 +240,10 @@ void test_pairs() {
 void test_high_cards() {
     u32 cards[5];
 
-    // lowest high card
     Eval::parse_hand(cards, "7d5c4s3h2d");
     assert((7462 == Eval::EvaluateHand(cards)) && "eval WA on 7d5c4s3h2d");
-
-    // highest high card
+    Eval::parse_hand(cards, "4h5cJh9d7s");
+    assert((7291 == Eval::EvaluateHand(cards)) && "eval WA on 4h5cJh9d7s");
     Eval::parse_hand(cards, "AdKhQsJc9h");
     assert((6186 == Eval::EvaluateHand(cards)) && "eval WA on AdKhQsJc9h");
 }
