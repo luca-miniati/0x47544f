@@ -206,6 +206,8 @@ void test_trips() {
     assert((1853 == Eval::EvaluateHand(cards)) && "eval WA on JcJdJs8c7h");
     Eval::parse_hand(cards, "AdAhAcQs2h");
     assert((1630 == Eval::EvaluateHand(cards)) && "eval WA on AdAhAcQs2h");
+    Eval::parse_hand(cards, "4sQd4d4c3s");
+    assert((2298 == Eval::EvaluateHand(cards)) && "eval WA on 4sQd4d4c3s");
     Eval::parse_hand(cards, "TsTdJdKdTc");
     assert((1886 == Eval::EvaluateHand(cards)) && "eval WA on TsTdJdKdTc");
 }
