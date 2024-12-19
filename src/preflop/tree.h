@@ -10,9 +10,10 @@ const int MAX_BET = 4;
 enum ACTIONS {
     CHECK,
     CALL,
+    FOLD,
+    ALL_IN,
     X2,
     X3,
-    ALL_IN
 };
 
 #endif

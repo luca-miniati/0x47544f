@@ -39,40 +39,15 @@ using u32 = uint32_t;
 // +-----------------+-------+------+-------+
 
 class Eval {
-public:
-    static constexpr size_t TABLE_SIZE = 7937;
-    static constexpr u32 CARD_BITMASK = 536805376;
-    static constexpr u32 CARD_SUIT = 61440;
-    static constexpr u32 CARD_RANK = 3840;
-    static constexpr u32 CARD_PRIME = 63;
-    //                                             2  3  4  5  6   7   8   9   T   J   Q   K   A
-    static constexpr std::array<int, 13> PRIMES = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
-
 private:
     // Lookup tables and map
+    static constexpr size_t TABLE_SIZE = 7937;
     std::array<int, TABLE_SIZE> flushes;
     std::array<int, TABLE_SIZE> straights_and_high_cards;
     std::unordered_map<u32, int> primes_to_index;
 
 public:
     Eval();
-
-    // Initialize lookup tables flushes and straights_and_high_cards.
-    void InitLookupTables();
-
-    // Initialize lookup map primes_to_index.
-    void InitPrimeToIndex();
-
-    // string -> card
-    // s should be of the form Rs, with R = rank, s = suit.
-    u32 ParseCard(const std::string& s) const;
-
-    // Populate array of cards with a string of the form RsRsRsRs, with R = rank, s = suit.
-    std::vector<u32> ParseHand(const std::string& h) const;
-
-    // card -> string
-    // returns string of the form Rs, with R = rank, s = suit.
-    std::string CardToString(u32 card) const;
 
     // Takes 5 cards represented as u32's and returns the index of the corresponding
     // hand.
@@ -82,6 +57,13 @@ public:
     //                    ParseCard("Jh"),
     //                    ParseCard("Th")}) = 1, since this is a Royal Flush.
     int EvaluateHand(const std::vector<u32>& cards);
+
+private:
+    // Initialize lookup tables flushes and straights_and_high_cards.
+    void InitLookupTables();
+
+    // Initialize lookup map primes_to_index.
+    void InitPrimeToIndex();
 };
 
 #endif
