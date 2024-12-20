@@ -8,6 +8,8 @@
 
 std::vector<ACTION> Node::GetActions(const std::vector<ACTION>& history) {
     std::vector<ACTION> actions;
+    if (is_terminal)
+        return actions;
 
     // can only check if there's no outstanding bets
     std::pair<double, double> bets = Utils::ComputeTotalBets(history);
@@ -35,7 +37,7 @@ std::vector<ACTION> Node::GetActions(const std::vector<ACTION>& history) {
 
 Node::Node(std::vector<ACTION> history) : history(history) {
     // set is_terminal
-    is_terminal = (history.back() == CALL
+    is_terminal = history.size() && (history.back() == CALL
                 || history.back() == CHECK
                 || history.back() == FOLD);
 
@@ -75,4 +77,40 @@ double Node::GetUtility(std::vector<u32>& deck) {
                                     : 1;
 
     return ((second_to_last == 1) ? p2 : p1) * showdown_multiplier * position_multiplier;
+}
+
+std::vector<double> Node::GetStrategy(double p) {
+    int num_actions = actions.size();
+    double norm = 0;
+    for (int a = 0; a < num_actions; a++) {
+        strategy[a] = fmax(regret_sum[a], 0.0);
+        norm += strategy[a];
+    }
+    for (int a = 0; a < num_actions; a++) {
+        if (norm > 0)
+            strategy[a] /= norm;
+        else
+            strategy[a] = 1.0 / num_actions;
+        strategy_sum[a] += p * strategy[a];
+    }
+    return strategy;
+}
+
+void Node::UpdateRegret(int a, double v) {
+    regret_sum[a] += v;
+}
+
+std::vector<double> Node::GetAverageStrategy() {
+    int num_actions = actions.size();
+    std::vector<double> average_strategy(num_actions);
+    double norm = 0;
+    for (int a = 0; a < num_actions; ++a)
+        norm += strategy_sum[a];
+    for (int a = 0; a < num_actions; ++a) {
+        if (norm > 0)
+        average_strategy[a] = strategy_sum[a] / norm;
+        else
+        average_strategy[a] = 1.0 / num_actions;
+    }
+    return average_strategy;
 }

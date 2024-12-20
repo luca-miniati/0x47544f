@@ -8,6 +8,76 @@
 #include <vector>
 #include <string>
 
+// Test constructor behaviors of Node.
+void test_constructor() {
+    // Tests for is_terminal
+
+    // shouldn't be terminal at the start
+    Node* node = new Node({});
+    assert(!node->is_terminal && "WA on is_terminal empty history");
+    // shouldn't be terminal after one bet
+    node = new Node({X2});
+    assert(!node->is_terminal && "WA on is_terminal on raise");
+    // shouldn't be terminal after one raise
+    node = new Node({X2, X3});
+    assert(!node->is_terminal && "WA on is_terminal bet raise");
+    // shouldn't be terminal after a jam
+    node = new Node({ALL_IN});
+    assert(!node->is_terminal && "WA on is_terminal jam");
+
+    // should be terminal after action goes raise call
+    node = new Node({X2, CALL});
+    assert(node->is_terminal && "WA on is_terminal bet call");
+    // should be terminal after action goes raise re-raise call
+    node = new Node({X2, X3, CALL});
+    assert(node->is_terminal && "WA on is_terminal re re-raise call");
+    // should be terminal after action goes raise re-raise fold
+    node = new Node({X2, X3, FOLD});
+    assert(node->is_terminal && "WA on is_terminal raise re-raise fold");
+    // should be terminal after action goes jam fold
+    node = new Node({ALL_IN, FOLD});
+    assert(node->is_terminal && "WA on is_terminal jam fold");
+    // should be terminal after action goes call check
+    node = new Node({CALL, CHECK});
+    assert(node->is_terminal && "WA on is_terminal call check");
+
+
+    // Tests for GetActions
+    // should have all except for check
+    node = new Node({});
+    std::vector<ACTION> expected = {CALL, FOLD, X2, X3, ALL_IN};
+    assert(expected == node->actions && "WA on actions empty history");
+    // should have all except for check
+    node = new Node({X2});
+    expected = {CALL, FOLD, X2, X3, ALL_IN};
+    assert(expected == node->actions && "WA on actions on raise");
+    // should have all except for check
+    node = new Node({X2, X3});
+    expected = {CALL, FOLD, X2, X3, ALL_IN};
+    assert(expected == node->actions && "WA on actions bet raise");
+    // should have all except for check
+    node = new Node({ALL_IN});
+    expected = {CALL, FOLD, X2, X3, ALL_IN};
+    assert(expected == node->actions && "WA on actions jam");
+
+    // should have no actions on terminal node
+    node = new Node({X2, CALL});
+    expected = {};
+    assert(expected == node->actions && "WA on actions bet call");
+    // should have no actions on terminal node
+    node = new Node({X2, X3, CALL});
+    assert(expected == node->actions && "WA on actions re re-raise call");
+    // should have no actions on terminal node
+    node = new Node({X2, X3, FOLD});
+    assert(expected == node->actions && "WA on actions raise re-raise fold");
+    // should have no actions on terminal node
+    node = new Node({ALL_IN, FOLD});
+    assert(expected == node->actions && "WA on actions jam fold");
+    // should have no actions on terminal node
+    node = new Node({CALL, CHECK});
+    assert(expected == node->actions && "WA on actions call check");
+}
+
 // Test the GetUtility function that returns the payoff for a terminal state.
 void test_get_utility() {
     // SB folds aces preflop
