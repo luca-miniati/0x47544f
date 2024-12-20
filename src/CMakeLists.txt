@@ -11,3 +11,9 @@ add_library(utils_lib
 )
 
 target_include_directories(utils_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_library(preflop_lib
+    preflop/node/node.cc
+)
+
+target_include_directories(preflop_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

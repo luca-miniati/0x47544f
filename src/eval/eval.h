@@ -58,6 +58,9 @@ public:
     //                    ParseCard("Th")}) = 1, since this is a Royal Flush.
     int EvaluateHand(const std::vector<u32>& cards);
 
+    // Uses EvaluateHand to get the best possible number for 7 cards
+    int GetBestHand(const std::vector<u32>& cards);
+
 private:
     // Initialize lookup tables flushes and straights_and_high_cards.
     void InitLookupTables();

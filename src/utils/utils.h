@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include "../eval/eval.h"
+#include "../preflop/tree.h"
 
 class Utils {
 public:
@@ -16,18 +17,21 @@ public:
     // s should be of the form Rs, with R = rank, s = suit.
     static u32 ParseCard(const std::string& s);
 
-    // Populate array of cards with a string of the form RsRsRsRs, with R = rank, s = suit.
-    static std::vector<u32> ParseHand(const std::string& h);
+    // Populate array of cards with a string of the form RsRsRsRs..., with R = rank, s = suit.
+    static std::vector<u32> ParseCards(const std::string& h);
 
     // card -> string
     // returns string of the form Rs, with R = rank, s = suit.
     static std::string CardToString(u32 card);
 
     // return an unshuffled deck, where the cards are represented by Cactus Kev
-    static std::vector<u32> make_deck();
+    static std::vector<u32> MakeDeck();
 
     // shuffle a deck
-    static void shuffle(std::vector<u32>& deck);
+    static void Shuffle(std::vector<u32>& deck);
+
+    // compute pot size
+    static std::pair<double, double> ComputeTotalBets(std::vector<ACTION> h);
 };
 
 #endif

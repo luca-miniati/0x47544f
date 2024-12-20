@@ -2,18 +2,19 @@
 #define TREE_H
 
 // 100 big blinds
-const int STACK_DEPTH = 100;
+constexpr int STACK_DEPTH = 100;
 // can't raise more than 4 times
-const int MAX_BET = 4;
+constexpr int MAX_RAISE = 4;
+// OOP only realizes 70% of equity post-flop
+constexpr double OOP_EQUITY_MULTIPLIER = 0.7;
 
-// assuming SB vs BB
-enum ACTIONS {
+enum ACTION {
     CHECK,
     CALL,
     FOLD,
-    ALL_IN,
     X2,
     X3,
+    ALL_IN
 };
 
 #endif

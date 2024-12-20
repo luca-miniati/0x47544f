@@ -6,6 +6,10 @@ add_executable(
     TestUtils
     utils/test_utils.cc
 )
+add_executable(
+    TestPreflop
+    preflop/node/test_node.cc
+)
 
 target_link_libraries(
     TestEval
@@ -19,6 +23,14 @@ target_link_libraries(
     eval_lib
     utils_lib
 )
+target_link_libraries(
+    TestPreflop
+    PUBLIC
+    eval_lib
+    utils_lib
+    preflop_lib
+)
 
 add_test(NAME TestEval COMMAND TestEval)
 add_test(NAME TestUtils COMMAND TestUtils)
+add_test(NAME TestPreflop COMMAND TestPreflop)

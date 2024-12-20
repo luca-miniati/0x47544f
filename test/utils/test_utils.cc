@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-// Test the utility function parse_card.
+// Test the utility function ParseCard.
 void test_parse_card() {
     // Parse cards
     assert((268443689 == Utils::ParseCard("Ah")) && "parse WA on Ah");
@@ -32,10 +32,10 @@ void test_parse_card() {
     }
 }
 
-// Test the utility function parse_hand.
-void test_parse_hand() {
+// Test the utility function ParseCards.
+void test_parse_cards() {
     // Parse hands
-    std::vector<u32> cards = Utils::ParseHand("AcAdAhAsKh");
+    std::vector<u32> cards = Utils::ParseCards("AcAdAhAsKh");
     std::vector<u32> expected = {
         Utils::ParseCard("Ac"),
         Utils::ParseCard("Ad"),
@@ -45,7 +45,7 @@ void test_parse_hand() {
     };
     assert(expected == cards && "parse WA on AcAdAhAsKh");
 
-    cards = Utils::ParseHand("2d3d4d5d6d");
+    cards = Utils::ParseCards("2d3d4d5d6d");
     expected[0] =  Utils::ParseCard("2d");
     expected[1] = Utils::ParseCard("3d");
     expected[2] = Utils::ParseCard("4d");
@@ -53,26 +53,8 @@ void test_parse_hand() {
     expected[4] = Utils::ParseCard("6d");
     assert(expected == cards && "parse WA on 2d3d4d5d6d");
 
-    // check exceptions
     try {
-        Utils::ParseHand("AhKhQhJh");
-        assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
-        // should throw this
-    } catch (...) {
-        assert(false && "wrong exception thrown");
-    }
-
-    try {
-        Utils::ParseHand("AhKhQhJhTh9h");
-        assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
-        // should throw this
-    } catch (...) {
-        assert(false && "wrong exception thrown");
-    }
-    try {
-        Utils::ParseHand("AhKhQh?hTh");
+        Utils::ParseCards("AhKhQh?hTh");
         assert(false && "exception not thrown");
     } catch (const std::invalid_argument& e) {
         // should throw this
@@ -81,7 +63,7 @@ void test_parse_hand() {
     }
 }
 
-// Test utility function card_to_string.
+// Test utility function CardToString.
 void test_card_to_string() {
     // Test cards
     assert(("Ac" == Utils::CardToString(Utils::ParseCard("Ac"))) && "card to string WA on Ac");
@@ -109,9 +91,9 @@ void test_card_to_string() {
     }
 }
 
-// Test utility function make_deck.
+// Test utility function MakeDeck.
 void test_make_deck() {
-    std::vector<u32> deck = Utils::make_deck();
+    std::vector<u32> deck = Utils::MakeDeck();
     std::vector<std::string> deck_strings;
     for (u32 c : deck)
         deck_strings.push_back(Utils::CardToString(c));
@@ -125,23 +107,93 @@ void test_make_deck() {
     assert(expected == deck_strings && "WA on make_deck");
 }
 
-// Test utility function shuffle.
+// Test utility function Shuffle.
 void test_shuffle() {
-    std::vector<u32> deck = Utils::make_deck();
+    std::vector<u32> deck = Utils::MakeDeck();
     std::vector<u32> shuffled;
     for (u32 c : deck)
         shuffled.push_back(c);
 
-    Utils::shuffle(shuffled);
+    Utils::Shuffle(shuffled);
     // this probably works
     assert(deck != shuffled && "shuffle didn't shuffle");
 }
 
+// Test utility function ComputeTotalBets.
+void test_compute_total_bets() {
+    // SB calls, BB checks
+    std::vector<ACTION> h = {CALL, CHECK};
+    std::pair<double, double> expected = {1.0, 1.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 2bb, BB folds
+    h = {X2, FOLD};
+    expected = {2.0, 1.0};
+    auto [a, b] = Utils::ComputeTotalBets(h);
+
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 2bb, BB calls
+    h = {X2, CALL};
+    expected = {2.0, 2.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 2bb, BB raises, SB folds
+    h = {X2, X2, FOLD};
+    expected = {2.0, 4.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 2bb, BB raises, SB calls
+    h = {X2, X2, CALL};
+    expected = {4.0, 4.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 2bb, BB raises, SB folds
+    h = {X2, X3, FOLD};
+    expected = {2.0, 6.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 2bb, BB raises, SB calls
+    h = {X2, X3, CALL};
+    expected = {6.0, 6.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 3bb, BB folds
+    h = {X3, FOLD};
+    expected = {3.0, 1.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 3bb, BB calls
+    h = {X3, CALL};
+    expected = {3.0, 3.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 3bb, BB raises, SB folds
+    h = {X3, X2, FOLD};
+    expected = {3.0, 6.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 3bb, BB raises, SB calls
+    h = {X3, X2, CALL};
+    expected = {6.0, 6.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 3bb, BB raises, SB folds
+    h = {X3, X3, FOLD};
+    expected = {3.0, 9.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+
+    // SB raises to 3bb, BB raises, SB calls
+    h = {X3, X3, CALL};
+    expected = {9.0, 9.0};
+    assert(expected == Utils::ComputeTotalBets(h));
+}
+
 int main() {
     test_parse_card();
-    test_parse_hand();
+    test_parse_cards();
     test_card_to_string();
-
     test_make_deck();
     test_shuffle();
+    test_compute_total_bets();
 }

@@ -100,3 +100,22 @@ int Eval::EvaluateHand(const std::vector<u32>& cards) {
 
     return primes_to_index[primes];
 }
+
+int Eval::GetBestHand(const std::vector<u32>& cards) {
+    int best = INT_MAX;
+
+    for (int i = 0; i < 7; ++i) {
+        for (int j = i + 1; j < 7; ++j) {
+            for (int k = j + 1; k < 7; ++k) {
+                for (int l = k + 1; l < 7; ++l) {
+                    for (int m = l + 1; m < 7; ++m) {
+                        std::vector<u32> hand = {cards[i], cards[j], cards[k], cards[l], cards[m]};
+                        best = std::min(best, EvaluateHand(hand));
+                    }
+                }
+            }
+        }
+    }
+
+    return best;
+}
