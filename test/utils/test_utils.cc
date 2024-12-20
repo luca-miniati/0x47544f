@@ -1,5 +1,5 @@
-#include "../../src/eval/eval.h"
-#include "../../src/utils/utils.h"
+#include "eval/eval.h"
+#include "utils/utils.h"
 #include <iostream>
 #include <cassert>
 #include <stdexcept>

@@ -1,6 +1,6 @@
-#include "../../eval/eval.h"
-#include "../../utils/utils.h"
-#include "../tree.h"
+#include "eval/eval.h"
+#include "utils/utils.h"
+#include "preflop/solver.h"
 #include "node.h"
 #include <iostream>
 #include <string>

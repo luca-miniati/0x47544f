@@ -1,7 +1,7 @@
-#include "../../../src/eval/eval.h"
-#include "../../../src/utils/utils.h"
-#include "../../../src/preflop/node/node.h"
-#include "preflop/tree.h"
+#include "eval/eval.h"
+#include "utils/utils.h"
+#include "preflop/node/node.h"
+#include "preflop/solver.h"
 #include <iostream>
 #include <cassert>
 #include <stdexcept>

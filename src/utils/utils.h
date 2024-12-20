@@ -1,8 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "../eval/eval.h"
-#include "../preflop/tree.h"
+#include "eval/eval.h"
+#include "preflop/solver.h"
 
 class Utils {
 public:

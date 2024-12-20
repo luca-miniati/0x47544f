@@ -1,6 +1,6 @@
 #include "eval/eval.h"
-#include "utils.h"
-#include "preflop/tree.h"
+#include "utils/utils.h"
+#include "preflop/solver.h"
 #include <iostream>
 #include <random>
 
