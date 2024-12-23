@@ -1,8 +1,7 @@
-#include "eval/eval.h"
-#include "utils/utils.h"
+#include "solver/eval/eval.h"
+#include "solver/utils/utils.h"
 #include <iostream>
 #include <cassert>
-#include <stdexcept>
 #include <vector>
 
 Eval eval;

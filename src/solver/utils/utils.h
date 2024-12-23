@@ -1,8 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "eval/eval.h"
-#include "preflop/solver.h"
+#include "solver/eval/eval.h"
+#include "solver/preflop/solver.h"
 
 class Utils {
 public:
@@ -31,10 +31,10 @@ public:
     static void Shuffle(std::vector<u32>& deck);
 
     // Compute pot size
-    static std::pair<double, double> ComputeTotalBets(std::vector<ACTION> h);
+    static std::pair<double, double> ComputeTotalBets(const std::vector<ACTION> &history);
 
     // Hash a state consisting of 2 cards and a betting history
-    static std::size_t HashState(u32 c1, u32 c2, std::vector<ACTION>& history);
+    static std::size_t HashState(u32 c1, u32 c2, const std::vector<ACTION>& history);
 
 private:
     // Helper to hash an ACTION enum object

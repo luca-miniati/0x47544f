@@ -1,10 +1,9 @@
-#include "eval/eval.h"
-#include "utils/utils.h"
+#include "solver/eval/eval.h"
+#include "solver/utils/utils.h"
 #include <bit>
-#include <stdexcept>
 #include <unordered_map>
 
-Eval::Eval() : flushes{}, straights_and_high_cards{}, primes_to_index{} {
+Eval::Eval() : flushes{}, straights_and_high_cards{} {
     InitLookupTables();
     InitPrimeToIndex();
 }
@@ -87,15 +86,15 @@ void Eval::InitPrimeToIndex() {
 }
 
 int Eval::EvaluateHand(const std::vector<u32>& cards) {
-    u32 suit = cards[0] & cards[1] & cards[2] & cards[3] & cards[4] & Utils::CARD_SUIT;
-    u32 bitmask = (cards[0] | cards[1] | cards[2] | cards[3] | cards[4]) >> 16;
+    const u32 suit = cards[0] & cards[1] & cards[2] & cards[3] & cards[4] & Utils::CARD_SUIT;
+    const u32 bitmask = (cards[0] | cards[1] | cards[2] | cards[3] | cards[4]) >> 16;
 
     if (suit)
         return flushes[bitmask];
     if (straights_and_high_cards[bitmask])
         return straights_and_high_cards[bitmask];
 
-    u32 primes = (cards[0] & Utils::CARD_PRIME) * (cards[1] & Utils::CARD_PRIME) * (cards[2] & Utils::CARD_PRIME) *
+    const u32 primes = (cards[0] & Utils::CARD_PRIME) * (cards[1] & Utils::CARD_PRIME) * (cards[2] & Utils::CARD_PRIME) *
                  (cards[3] & Utils::CARD_PRIME) * (cards[4] & Utils::CARD_PRIME);
 
     return primes_to_index[primes];

@@ -1,6 +1,6 @@
-#include "eval/eval.h"
-#include "utils/utils.h"
-#include "preflop/solver.h"
+#include "solver/eval/eval.h"
+#include "solver/utils/utils.h"
+#include "solver/preflop/solver.h"
 #include <iostream>
 #include <random>
 
@@ -15,9 +15,9 @@ u32 Utils::ParseCard(const std::string& s) {
 
     if (s.length() != 2)
         throw std::invalid_argument("card must be in the form Rs, where R = rank, s = suit");
-    if (!char_to_rank_index.count(s[0]))
+    if (!char_to_rank_index.contains(s[0]))
         throw std::invalid_argument("invalid rank");
-    if (!char_to_suit_index.count(s[1]))
+    if (!char_to_suit_index.contains(s[1]))
         throw std::invalid_argument("invalid suit");
 
     u32 card = 0;
@@ -49,10 +49,10 @@ std::string Utils::CardToString(u32 card) {
         {3, 'c'}, {2, 'd'}, {1, 'h'}, {0, 's'}
     };
 
-    int rank_index = std::bit_width(card >> 16) - 1;
-    int suit_index = std::bit_width((card & CARD_SUIT) >> 12) - 1;
+    const int rank_index = std::bit_width(card >> 16) - 1;
+    const int suit_index = std::bit_width((card & CARD_SUIT) >> 12) - 1;
 
-    if (!rank_index_to_char.count(rank_index) || !suit_index_to_char.count(suit_index))
+    if (!rank_index_to_char.contains(rank_index) || !suit_index_to_char.contains(suit_index))
         throw std::invalid_argument("invalid card");
 
     return std::string(1, rank_index_to_char.at(rank_index)) + suit_index_to_char.at(suit_index);
@@ -60,8 +60,8 @@ std::string Utils::CardToString(u32 card) {
 
 std::vector<u32> Utils::MakeDeck() {
     std::vector<u32> deck;
-    std::string ranks = "23456789TJQKA";
-    std::string suits = "cdhs";
+    const std::string ranks = "23456789TJQKA";
+    const std::string suits = "cdhs";
 
     for (int s = 0; s < suits.length(); ++s)
         for (int r = 0; r < ranks.length(); ++r)
@@ -71,30 +71,31 @@ std::vector<u32> Utils::MakeDeck() {
 }
 
 void Utils::Shuffle(std::vector<u32>& deck) {
-    std::random_device rd = std::random_device();
-    std::default_random_engine rng = std::default_random_engine(rd());
+    auto rd = std::random_device();
+    auto rng = std::default_random_engine(rd());
     std::ranges::shuffle(deck, rng);
 }
 
-std::pair<double, double> Utils::ComputeTotalBets(std::vector<ACTION> h) {
+std::pair<double, double> Utils::ComputeTotalBets(const std::vector<ACTION> &history) {
     double p1 = 0.5, p2 = 1;
 
-    int t = h.size();
+    const unsigned long t = history.size();
     for (int a = 0; a < t; ++a) {
-        if (h[a] == CHECK) {
+        if (history[a] == CHECK) {
             break;
-        } else if (h[a] == CALL) {
+        }
+        if (history[a] == CALL) {
             p1 = std::max(p1, p2);
             p2 = std::max(p1, p2);
-        } else if (h[a] == FOLD) {
+        } else if (history[a] == FOLD) {
             break;
-        } else if (h[a] == ALL_IN) {
+        } else if (history[a] == ALL_IN) {
             if (a % 2) p2 = STACK_DEPTH;
             else       p1 = STACK_DEPTH;
-        } else if (h[a] == X2) {
+        } else if (history[a] == X2) {
             if (a % 2) p2 = 2 * p1;
             else       p1 = 2 * p2;
-        } else if (h[a] == X3) {
+        } else if (history[a] == X3) {
             if (a % 2) p2 = 3 * p1;
             else       p1 = 3 * p2;
         }
@@ -103,7 +104,7 @@ std::pair<double, double> Utils::ComputeTotalBets(std::vector<ACTION> h) {
     return {p1, p2};
 }
 
-std::size_t Utils::HashState(u32 c1, u32 c2, std::vector<ACTION>& history) {
+std::size_t Utils::HashState(const u32 c1, const u32 c2, const std::vector<ACTION>& history) {
     std::size_t seed = 0;
     // hash c1 and c2
     std::size_t val = std::hash<u32>{}(c1);
@@ -111,8 +112,7 @@ std::size_t Utils::HashState(u32 c1, u32 c2, std::vector<ACTION>& history) {
     val = std::hash<u32>{}(c2);
     HashCombine(seed, val);
     // hash actions
-    for (ACTION action : history) {
-        auto val = static_cast<std::underlying_type_t<ACTION>>(action);
+    for (const ACTION action : history) {
         std::size_t element_hash = std::hash<std::underlying_type_t<ACTION>>()(action);
         HashCombine(seed, element_hash);
     }

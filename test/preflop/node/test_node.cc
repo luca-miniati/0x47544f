@@ -1,12 +1,10 @@
-#include "eval/eval.h"
-#include "utils/utils.h"
-#include "preflop/node/node.h"
-#include "preflop/solver.h"
+#include "solver/eval/eval.h"
+#include "solver/utils/utils.h"
+#include "solver/preflop/node/node.h"
+#include "solver/preflop/solver.h"
 #include <iostream>
 #include <cassert>
-#include <stdexcept>
 #include <vector>
-#include <string>
 
 // Test constructor behaviors of Node.
 void test_constructor() {

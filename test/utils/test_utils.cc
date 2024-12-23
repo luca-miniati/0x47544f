@@ -1,10 +1,11 @@
-#include "eval/eval.h"
-#include "utils/utils.h"
+#include "solver/eval/eval.h"
+#include "solver/utils/utils.h"
 #include <iostream>
 #include <cassert>
 #include <stdexcept>
 #include <vector>
 #include <string>
+#include <solver/preflop/solver.h>
 
 // Test the utility function ParseCard.
 void test_parse_card() {
@@ -17,7 +18,7 @@ void test_parse_card() {
     try {
         Utils::ParseCard("Ahh");
         assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
         // should throw this
     } catch (...) {
         assert(false && "wrong exception thrown");
@@ -25,7 +26,7 @@ void test_parse_card() {
     try {
         Utils::ParseCard("#d");
         assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
         // should throw this
     } catch (...) {
         assert(false && "wrong exception thrown");
@@ -56,7 +57,7 @@ void test_parse_cards() {
     try {
         Utils::ParseCards("AhKhQh?hTh");
         assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
         // should throw this
     } catch (...) {
         assert(false && "wrong exception thrown");
@@ -75,7 +76,7 @@ void test_card_to_string() {
     try {
         Utils::CardToString(0);
         assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
         // should throw this
     } catch (...) {
         assert(false && "wrong exception thrown");
@@ -84,7 +85,7 @@ void test_card_to_string() {
     try {
         Utils::CardToString(393216);
         assert(false && "exception not thrown");
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
         // should throw this
     } catch (...) {
         assert(false && "wrong exception thrown");
@@ -93,12 +94,12 @@ void test_card_to_string() {
 
 // Test utility function MakeDeck.
 void test_make_deck() {
-    std::vector<u32> deck = Utils::MakeDeck();
+    const std::vector<u32> deck = Utils::MakeDeck();
     std::vector<std::string> deck_strings;
-    for (u32 c : deck)
+    for (const u32 c : deck)
         deck_strings.push_back(Utils::CardToString(c));
 
-    std::vector<std::string> expected = {
+    const std::vector<std::string> expected = {
         "2c", "3c", "4c", "5c", "6c", "7c", "8c", "9c", "Tc", "Jc", "Qc", "Kc", "Ac",
         "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd", "Ad",
         "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh", "Ah",
@@ -109,7 +110,7 @@ void test_make_deck() {
 
 // Test utility function Shuffle.
 void test_shuffle() {
-    std::vector<u32> deck = Utils::MakeDeck();
+    const std::vector<u32> deck = Utils::MakeDeck();
     std::vector<u32> shuffled;
     for (u32 c : deck)
         shuffled.push_back(c);
@@ -122,8 +123,8 @@ void test_shuffle() {
 // Test utility function ComputeTotalBets.
 void test_compute_total_bets() {
     // SB calls, BB checks
-    std::vector<ACTION> h = {CALL, CHECK};
-    std::pair<double, double> expected = {1.0, 1.0};
+    std::vector h = {CALL, CHECK};
+    std::pair expected = {1.0, 1.0};
     assert(expected == Utils::ComputeTotalBets(h));
 
     // SB raises to 2bb, BB folds
