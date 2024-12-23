@@ -1,0 +1,137 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.30"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "src",
+					"jsonFile" : "directory-src-Release-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.30"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5
+					]
+				},
+				{
+					"build" : "test",
+					"jsonFile" : "directory-test-Release-451c0598f41488bb20b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.30"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "test",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2
+					],
+					"name" : "0x47544f",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "TestEval::@36f028580bb02cc8272a",
+					"jsonFile" : "target-TestEval-Release-b490aee0f01b0426ff80.json",
+					"name" : "TestEval",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "TestPreflop::@36f028580bb02cc8272a",
+					"jsonFile" : "target-TestPreflop-Release-2e5d68f21fe768df2873.json",
+					"name" : "TestPreflop",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "TestUtils::@36f028580bb02cc8272a",
+					"jsonFile" : "target-TestUtils-Release-2b85ec4d821f34e42a4d.json",
+					"name" : "TestUtils",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "eval_lib::@145eef247bfb46b6828c",
+					"jsonFile" : "target-eval_lib-Release-ecfad24d7f157d8bc4a7.json",
+					"name" : "eval_lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "preflop_lib::@145eef247bfb46b6828c",
+					"jsonFile" : "target-preflop_lib-Release-0b1de307a05fbe364967.json",
+					"name" : "preflop_lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "utils_lib::@145eef247bfb46b6828c",
+					"jsonFile" : "target-utils_lib-Release-ef79c845ee043096735e.json",
+					"name" : "utils_lib",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/lucaminiati/math/0x47544f/cmake-build-release",
+		"source" : "/Users/lucaminiati/math/0x47544f"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

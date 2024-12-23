@@ -1,0 +1,48 @@
+Start testing: Dec 23 11:00 PST
+----------------------------------------------------------
+1/3 Testing: TestEval
+1/3 Test: TestEval
+Command: "/Users/lucaminiati/math/0x47544f/cmake-build-debug/test/TestEval"
+Directory: /Users/lucaminiati/math/0x47544f/cmake-build-debug/test
+"TestEval" start time: Dec 23 11:00 PST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"TestEval" end time: Dec 23 11:00 PST
+"TestEval" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/3 Testing: TestUtils
+2/3 Test: TestUtils
+Command: "/Users/lucaminiati/math/0x47544f/cmake-build-debug/test/TestUtils"
+Directory: /Users/lucaminiati/math/0x47544f/cmake-build-debug/test
+"TestUtils" start time: Dec 23 11:00 PST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"TestUtils" end time: Dec 23 11:00 PST
+"TestUtils" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/3 Testing: TestPreflop
+3/3 Test: TestPreflop
+Command: "/Users/lucaminiati/math/0x47544f/cmake-build-debug/test/TestPreflop"
+Directory: /Users/lucaminiati/math/0x47544f/cmake-build-debug/test
+"TestPreflop" start time: Dec 23 11:00 PST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"TestPreflop" end time: Dec 23 11:00 PST
+"TestPreflop" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 23 11:00 PST
