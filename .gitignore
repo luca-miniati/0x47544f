@@ -1,6 +1,4 @@
-build
-cmake-build-debug
-cmake-build-release
+build/*
 .cache
 .clangd
 .ccls-cache
