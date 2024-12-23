@@ -102,3 +102,24 @@ std::pair<double, double> Utils::ComputeTotalBets(std::vector<ACTION> h) {
 
     return {p1, p2};
 }
+
+std::size_t Utils::HashState(u32 c1, u32 c2, std::vector<ACTION>& history) {
+    std::size_t seed = 0;
+    // hash c1 and c2
+    std::size_t val = std::hash<u32>{}(c1);
+    HashCombine(seed, val);
+    val = std::hash<u32>{}(c2);
+    HashCombine(seed, val);
+    // hash actions
+    for (ACTION action : history) {
+        auto val = static_cast<std::underlying_type_t<ACTION>>(action);
+        std::size_t element_hash = std::hash<std::underlying_type_t<ACTION>>()(action);
+        HashCombine(seed, element_hash);
+    }
+    return seed;
+}
+
+void Utils::HashCombine(std::size_t& seed, std::size_t& value) {
+    constexpr std::size_t kMagic = 0x9e3779b97f4a7c16ULL;
+    seed ^= value + kMagic + (seed << 6) + (seed >> 2);
+}

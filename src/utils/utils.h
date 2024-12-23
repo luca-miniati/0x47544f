@@ -21,17 +21,27 @@ public:
     static std::vector<u32> ParseCards(const std::string& h);
 
     // card -> string
-    // returns string of the form Rs, with R = rank, s = suit.
+    // Returns string of the form Rs, with R = rank, s = suit.
     static std::string CardToString(u32 card);
 
-    // return an unshuffled deck, where the cards are represented by Cactus Kev
+    // Return an unshuffled deck, where the cards are represented by Cactus Kev
     static std::vector<u32> MakeDeck();
 
-    // shuffle a deck
+    // Shuffle a deck
     static void Shuffle(std::vector<u32>& deck);
 
-    // compute pot size
+    // Compute pot size
     static std::pair<double, double> ComputeTotalBets(std::vector<ACTION> h);
+
+    // Hash a state consisting of 2 cards and a betting history
+    static std::size_t HashState(u32 c1, u32 c2, std::vector<ACTION>& history);
+
+private:
+    // Helper to hash an ACTION enum object
+    static std::size_t HashAction(ACTION a);
+
+    // Helper to combine hashes
+    static void HashCombine(std::size_t& seed, std::size_t& value);
 };
 
 #endif
