@@ -46,16 +46,9 @@ public:
 	                                          const std::vector<std::shared_ptr<PreflopAction>>& history
 	                                          ) const = 0;
 
-	/**
-	 * Returns a hash of this action.
-	 * @return a hash of this action
-	 */
-	[[nodiscard]] virtual std::size_t Hash() const = 0;
-
-	// Static Factory methods
 	static std::shared_ptr<PreflopAction> Fold(int player);
 	static std::shared_ptr<PreflopAction> Check(int player);
-	static std::shared_ptr<PreflopAction> BetProportionPot(int player, double bet_multiplier);
+	static std::shared_ptr<PreflopAction> BetFixed(int player, double bet_amount);
 	static std::shared_ptr<PreflopAction> BetMultiple(int player, double bet_multiplier);
 	static std::shared_ptr<PreflopAction> BetAllIn(int player);
 };
@@ -69,8 +62,6 @@ public:
 
 	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] std::size_t Hash() const override;
 };
 
 class Check final : public PreflopAction {
@@ -82,22 +73,18 @@ public:
 
 	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] std::size_t Hash() const override;
 };
 
-class BetProportionPot final : public PreflopAction {
-	double bet_multiplier;
+class BetFixed final : public PreflopAction {
+	int bet_amount;
 public:
-	explicit BetProportionPot(int player, double bet_multiplier);
+	explicit BetFixed(int player, int bet_amount);
 
 	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 
 	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] std::size_t Hash() const override;
 };
 
 class BetMultiple final : public PreflopAction {
@@ -110,8 +97,6 @@ public:
 
 	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] std::size_t Hash() const override;
 };
 
 class BetAllIn final : public PreflopAction {
@@ -123,8 +108,6 @@ public:
 
 	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] std::size_t Hash() const override;
 };
 
 #endif //PREFLOP_ACTION_H

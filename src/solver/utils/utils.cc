@@ -99,17 +99,16 @@ std::size_t Utils::HashState(const u32 c1, const u32 c2,
     std::size_t val = std::hash<u32>{}(c1);
     HashCombine(seed, val);
     val = std::hash<u32>{}(c2);
-    seed = HashCombine(seed, val);
+    HashCombine(seed, val);
     // hash actions
     for (auto& action : history) {
-        std::size_t element_hash = action->Hash();
-        seed = HashCombine(seed, element_hash);
+        std::size_t element_hash = std::hash<PreflopAction>()(action);
+        HashCombine(seed, element_hash);
     }
     return seed;
 }
 
-std::size_t Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
+void Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
     constexpr std::size_t kMagic = 0x9e3779b97f4a7c16ULL;
     seed ^= value + kMagic + (seed << 6) + (seed >> 2);
-    return seed;
 }
