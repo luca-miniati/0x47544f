@@ -131,7 +131,6 @@ bool BetProportionPot::isTerminal(const std::vector<std::shared_ptr<PreflopActio
 
 bool BetMultiple::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// betting a multiple of the current bet is legal if the player has enough chips
 	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
 
 	if (p1_bet == p2_bet || (bet_multiplier > 1 && bet_multiplier < 2) || bet_multiplier < 1) { 
@@ -141,7 +140,8 @@ bool BetMultiple::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
 	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
 
-	return req_amount <= curr_player_stack || std::max(p1_bet, p2_bet) > curr_player_stack;
+	return req_amount <= curr_player_stack || 
+		   (std::max(p1_bet, p2_bet) > curr_player_stack && bet_multiplier == 1);
 }
 
 double BetMultiple::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
