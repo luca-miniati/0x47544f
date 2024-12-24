@@ -1,16 +1,15 @@
 #include "solver/eval/eval.h"
 #include "solver/utils/utils.h"
-#include "solver/preflop/solver.h"
+#include "solver/preflop/preflop_action/preflop_action.h"
 #include "node.h"
 
-std::vector<ACTION> Node::GetActions(const std::vector<ACTION>& history) const {
-    std::vector<ACTION> actions;
+std::vector<PreflopAction> Node::GetActions(const std::vector<PreflopAction>& history) const {
+    std::vector<PreflopAction> actions;
     if (is_terminal)
         return actions;
 
     // can only check if there's no outstanding bets
-    std::pair<double, double> bets = Utils::ComputeTotalBets(history);
-    if (bets.first == bets.second)
+    if (auto [bet1, bet2] = Utils::ComputeTotalBets(history); bet1 == bet2)
         actions.push_back(CHECK);
     // we can only call if there's an outstanding bet
     else
@@ -22,7 +21,7 @@ std::vector<ACTION> Node::GetActions(const std::vector<ACTION>& history) const {
     // add raises
     int num_raises = 0;
     for (const ACTION action : history)
-        num_raises += (action == X2 || action == X3 || action == ALL_IN);
+        num_raises += action == X2 || action == X3 || action == ALL_IN;
     if (num_raises < MAX_RAISE) {
         actions.push_back(X2);
         actions.push_back(X3);
@@ -54,7 +53,7 @@ double Node::GetUtility(const std::vector<u32>& deck) {
     // this is 1 if p1 was second to last, 2 otherwise
     const unsigned long second_to_last = 2 - (history.size() + 1) % 2;
     // compute the amount each player put into the pot
-    auto [p1, p2] = Utils::ComputeTotalBets(history);
+    auto [p1, p2] = Utils::ComputeOutstandingBets(history);
     if (history.back() == FOLD)
         return (second_to_last == 1) ? p2 * OOP_EQUITY_MULTIPLIER : p1;
 

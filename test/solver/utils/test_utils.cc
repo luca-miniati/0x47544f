@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <string>
-#include <solver/preflop/solver.h>
+#include <solver/preflop/preflop_solver.h>
 
 // Test the utility function ParseCard.
 void test_parse_card() {

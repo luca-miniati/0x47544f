@@ -2,9 +2,12 @@
 #define UTILS_H
 
 #include "solver/eval/eval.h"
-#include "solver/preflop/solver.h"
+#include "solver/preflop/preflop_solver.h"
 
 class Utils {
+    // Helper to combine hashes
+    static void HashCombine(std::size_t& seed, const std::size_t& value);
+
 public:
     static constexpr u32 CARD_BITMASK = 536805376;
     static constexpr u32 CARD_SUIT = 61440;
@@ -15,10 +18,10 @@ public:
 
     // string -> card
     // s should be of the form Rs, with R = rank, s = suit.
-    static u32 ParseCard(const std::string& s);
+    static u32 ParseCard(const std::string& card_string);
 
     // Populate array of cards with a string of the form RsRsRsRs..., with R = rank, s = suit.
-    static std::vector<u32> ParseCards(const std::string& h);
+    static std::vector<u32> ParseCards(const std::string& cards_string);
 
     // card -> string
     // Returns string of the form Rs, with R = rank, s = suit.
@@ -31,17 +34,13 @@ public:
     static void Shuffle(std::vector<u32>& deck);
 
     // Compute pot size
-    static std::pair<double, double> ComputeTotalBets(const std::vector<ACTION> &history);
+    static std::pair<double, double> ComputeOutstandingBets(int p1_stack_depth, int p2_stack_depth,
+        const std::vector<std::shared_ptr<PreflopAction>>& history);
 
     // Hash a state consisting of 2 cards and a betting history
-    static std::size_t HashState(u32 c1, u32 c2, const std::vector<ACTION>& history);
+    static std::size_t HashState(u32 c1, u32 c2,
+        const std::vector<std::shared_ptr<PreflopAction>>& history);
 
-private:
-    // Helper to hash an ACTION enum object
-    static std::size_t HashAction(ACTION a);
-
-    // Helper to combine hashes
-    static void HashCombine(std::size_t& seed, std::size_t& value);
 };
 
 #endif

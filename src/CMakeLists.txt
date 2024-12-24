@@ -2,6 +2,12 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 
 add_library(eval_lib
         solver/eval/eval.cc
+        solver/preflop/preflop_solver.cc
+        solver/preflop/preflop_solver.h
+        solver/preflop/preflop_action/preflop_action.cc
+        solver/preflop/preflop_action/preflop_action.h
+        solver/preflop/range/range.cc
+        solver/preflop/range/range.h
 )
 
 target_include_directories(eval_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

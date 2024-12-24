@@ -1,10 +1,10 @@
 #include "solver/eval/eval.h"
 #include "solver/utils/utils.h"
-#include "solver/preflop/solver.h"
+#include "solver/preflop/preflop_solver.h"
 #include <iostream>
 #include <random>
 
-u32 Utils::ParseCard(const std::string& s) {
+u32 Utils::ParseCard(const std::string& card_string) {
     static const std::unordered_map<char, int> char_to_rank_index = {
         {'A', 12}, {'K', 11}, {'Q', 10}, {'J', 9}, {'T', 8}, {'9', 7},
         {'8', 6}, {'7', 5}, {'6', 4}, {'5', 3}, {'4', 2}, {'3', 1}, {'2', 0}
@@ -13,34 +13,34 @@ u32 Utils::ParseCard(const std::string& s) {
         {'c', 3}, {'d', 2}, {'h', 1}, {'s', 0}
     };
 
-    if (s.length() != 2)
+    if (card_string.length() != 2)
         throw std::invalid_argument("card must be in the form Rs, where R = rank, s = suit");
-    if (!char_to_rank_index.contains(s[0]))
+    if (!char_to_rank_index.contains(card_string[0]))
         throw std::invalid_argument("invalid rank");
-    if (!char_to_suit_index.contains(s[1]))
+    if (!char_to_suit_index.contains(card_string[1]))
         throw std::invalid_argument("invalid suit");
 
     u32 card = 0;
-    int rank_index = char_to_rank_index.at(s[0]);
-    int suit_index = char_to_suit_index.at(s[1]);
+    const int rank_index = char_to_rank_index.at(card_string[0]);
+    const int suit_index = char_to_suit_index.at(card_string[1]);
 
-    card |= (1 << (rank_index + 16));
+    card |= 1 << rank_index + 16;
     card |= PRIMES[rank_index];
-    card |= (1 << (suit_index + 12));
+    card |= 1 << suit_index + 12;
 
     return card;
 }
 
-std::vector<u32> Utils::ParseCards(const std::string& h) {
-    std::vector<u32> cards(h.length() / 2);
+std::vector<u32> Utils::ParseCards(const std::string& cards_string) {
+    std::vector<u32> cards(cards_string.length() / 2);
 
-    for (int i = 0; i < h.length() / 2; ++i)
-        cards[i] = ParseCard(h.substr(2 * i, 2));
+    for (int i = 0; i < cards_string.length() / 2; ++i)
+        cards[i] = ParseCard(cards_string.substr(2 * i, 2));
 
     return cards;
 }
 
-std::string Utils::CardToString(u32 card) {
+std::string Utils::CardToString(const u32 card) {
     static const std::unordered_map<int, char> rank_index_to_char = {
         {12, 'A'}, {11, 'K'}, {10, 'Q'}, {9, 'J'}, {8, 'T'}, {7, '9'},
         {6, '8'}, {5, '7'}, {4, '6'}, {3, '5'}, {2, '4'}, {1, '3'}, {0, '2'}
@@ -76,35 +76,24 @@ void Utils::Shuffle(std::vector<u32>& deck) {
     std::ranges::shuffle(deck, rng);
 }
 
-std::pair<double, double> Utils::ComputeTotalBets(const std::vector<ACTION> &history) {
+std::pair<double, double> Utils::ComputeOutstandingBets(const int p1_stack_depth,
+    const int p2_stack_depth, const std::vector<std::shared_ptr<PreflopAction>>& history) {
     double p1 = 0.5, p2 = 1;
 
-    const unsigned long t = history.size();
-    for (int a = 0; a < t; ++a) {
-        if (history[a] == CHECK) {
-            break;
-        }
-        if (history[a] == CALL) {
-            p1 = std::max(p1, p2);
-            p2 = std::max(p1, p2);
-        } else if (history[a] == FOLD) {
-            break;
-        } else if (history[a] == ALL_IN) {
-            if (a % 2) p2 = STACK_DEPTH;
-            else       p1 = STACK_DEPTH;
-        } else if (history[a] == X2) {
-            if (a % 2) p2 = 2 * p1;
-            else       p1 = 2 * p2;
-        } else if (history[a] == X3) {
-            if (a % 2) p2 = 3 * p1;
-            else       p1 = 3 * p2;
-        }
+    for (auto& action : history) {
+        if (action->GetPlayer() == 1)
+            p1 += action->GetBetAmount(p1_stack_depth, p2_stack_depth,
+                                       history);
+        else
+            p2 += action->GetBetAmount(p1_stack_depth, p2_stack_depth,
+                                       history);
     }
 
-    return {p1, p2};
+    return std::make_pair(p1, p2);
 }
 
-std::size_t Utils::HashState(const u32 c1, const u32 c2, const std::vector<ACTION>& history) {
+std::size_t Utils::HashState(const u32 c1, const u32 c2,
+    const std::vector<std::shared_ptr<PreflopAction>>& history) {
     std::size_t seed = 0;
     // hash c1 and c2
     std::size_t val = std::hash<u32>{}(c1);
@@ -112,14 +101,14 @@ std::size_t Utils::HashState(const u32 c1, const u32 c2, const std::vector<ACTIO
     val = std::hash<u32>{}(c2);
     HashCombine(seed, val);
     // hash actions
-    for (const ACTION action : history) {
-        std::size_t element_hash = std::hash<std::underlying_type_t<ACTION>>()(action);
+    for (auto& action : history) {
+        std::size_t element_hash = std::hash<PreflopAction>()(action);
         HashCombine(seed, element_hash);
     }
     return seed;
 }
 
-void Utils::HashCombine(std::size_t& seed, std::size_t& value) {
+void Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
     constexpr std::size_t kMagic = 0x9e3779b97f4a7c16ULL;
     seed ^= value + kMagic + (seed << 6) + (seed >> 2);
 }

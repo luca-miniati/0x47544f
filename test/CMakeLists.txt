@@ -1,14 +1,14 @@
 add_executable(
     TestEval
-    eval/test_eval.cc
+        solver/eval/test_eval.cc
 )
 add_executable(
     TestUtils
-    utils/test_utils.cc
+        solver/utils/test_utils.cc
 )
 add_executable(
     TestPreflop
-    preflop/node/test_node.cc
+        solver/preflop/node/test_node.cc
 )
 
 target_link_libraries(
