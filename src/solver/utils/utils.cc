@@ -117,5 +117,7 @@ std::size_t Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
 double Utils::ComputeMinimumRaise(const double p1_bet, const double p2_bet,
     const std::vector<std::shared_ptr<PreflopAction>>& history) {
     double current_max_bet = std::max(p1_bet, p2_bet);
-    return current_max_bet * 2;
+    double current_min_bet = std::min(p1_bet, p2_bet);
+    double last_raise = current_max_bet - current_min_bet;
+    return last_raise * 2;
 }

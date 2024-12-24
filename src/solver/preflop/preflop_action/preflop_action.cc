@@ -133,6 +133,11 @@ bool BetMultiple::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
 	// betting a multiple of the current bet is legal if the player has enough chips
 	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+
+	if (p1_bet == p2_bet && (bet_multiplier > 1 && bet_multiplier < 2) && bet_multiplier < 1) { 
+		return false;
+	}
+
 	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
 	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
 	return req_amount <= curr_player_stack;
