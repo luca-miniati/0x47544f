@@ -99,16 +99,22 @@ std::size_t Utils::HashState(const u32 c1, const u32 c2,
     std::size_t val = std::hash<u32>{}(c1);
     HashCombine(seed, val);
     val = std::hash<u32>{}(c2);
-    HashCombine(seed, val);
+    seed = HashCombine(seed, val);
     // hash actions
     for (auto& action : history) {
-        std::size_t element_hash = std::hash<PreflopAction>()(action);
-        HashCombine(seed, element_hash);
+        std::size_t element_hash = action->Hash();
+        seed = HashCombine(seed, element_hash);
     }
     return seed;
 }
 
-void Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
+std::size_t Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
     constexpr std::size_t kMagic = 0x9e3779b97f4a7c16ULL;
     seed ^= value + kMagic + (seed << 6) + (seed >> 2);
+    return seed;
+}
+
+double Utils::ComputeMinimumRaise(const double p1_bet, const double p2_bet,
+    const std::vector<std::shared_ptr<PreflopAction>>& history) {
+    return (std::max(p1_bet, p2_bet) - std::min(p1_bet, p2_bet)) * 2;
 }
