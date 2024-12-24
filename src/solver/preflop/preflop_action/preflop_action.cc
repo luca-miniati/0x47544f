@@ -8,10 +8,9 @@
 PreflopAction::PreflopAction(const int player) : player(player) {}
 Fold::Fold(const int player) : PreflopAction(player) {}
 Check::Check(const int player) : PreflopAction(player) {}
-Call::Call(const int player) : PreflopAction(player) {}
 BetFixed::BetFixed(const int player, const int bet_amount) : PreflopAction(player),
 bet_amount(bet_amount) {}
-BetMultiple::BetMultiple(const int player, const int bet_multiplier) : PreflopAction(player),
+BetMultiple::BetMultiple(const int player, const double bet_multiplier) : PreflopAction(player),
 bet_multiplier(bet_multiplier) {}
 BetAllIn::BetAllIn(const int player) : PreflopAction(player) {}
 

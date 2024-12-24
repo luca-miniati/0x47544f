@@ -88,9 +88,9 @@ public:
 };
 
 class BetMultiple final : public PreflopAction {
-	int bet_multiplier;
+	double bet_multiplier;
 public:
-	explicit BetMultiple(int player, int bet_multiplier);
+	explicit BetMultiple(int player, double bet_multiplier);
 
 	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
