@@ -43,8 +43,16 @@ int PreflopAction::GetPlayer() const {
 
 bool Fold::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// folding is always legal
-	return true;
+	// folding is legal only if there's an outstanding bet to respond to
+	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+	
+	if (GetPlayer() == 1) {
+		// p1 can fold only if p2 has made a higher bet
+		return p2_bet > p1_bet;
+	} else {
+		// p2 can fold only if p1 has made a higher bet
+		return p1_bet > p2_bet;
+	}
 }
 
 double Fold::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
@@ -55,6 +63,11 @@ double Fold::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 
 std::size_t Fold::Hash() const {
 	return std::hash<int>{}(GetPlayer());
+}
+
+bool Fold::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
+	// folding is always terminal
+	return true;
 }
 
 // Check
@@ -76,15 +89,22 @@ std::size_t Check::Hash() const {
 	return std::hash<int>{}(GetPlayer());
 }
 
+bool Check::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
+	// in preflop, heads-up, checking is terminal
+	return true;
+}
+
 // BetProportionPot
 
 bool BetProportionPot::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// betting a proportion of the pot is always legal as long as the player has enough chips
 	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
 	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
-	return req_amount <= curr_player_stack;
+	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
+	double min_raise = Utils::ComputeMinimumRaise(p1_bet, p2_bet, history);
+	
+	// a valid bet must be at least the minimum raise and within the player's stack
+	return (req_amount >= min_raise) && (req_amount <= curr_player_stack);
 }
 
 double BetProportionPot::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
@@ -102,13 +122,17 @@ std::size_t BetProportionPot::Hash() const {
 	return seed;
 }
 
+bool BetProportionPot::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
+	// in preflop, heads-up, betting is not terminal
+	return false;
+}
+
 // BetMultiple
 
 bool BetMultiple::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
 	// betting a multiple of the current bet is legal if the player has enough chips
 	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	double current_bet = std::max(p1_bet, p2_bet);
 	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
 	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
 	return req_amount <= curr_player_stack;
@@ -116,11 +140,16 @@ bool BetMultiple::IsLegal(int p1_stack_depth, int p2_stack_depth,
 
 double BetMultiple::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// calculate the current bet to multiply
+	// Get current outstanding bets
 	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+	
+	// find the last raise amount
 	double curr_bet = std::max(p1_bet, p2_bet);
-	// bet is a multiple of the current bet
-	return curr_bet * bet_multiplier;
+	double prev_bet = std::min(p1_bet, p2_bet);
+	double last_raise = curr_bet - prev_bet;
+	
+	// bet is a multiple of the last raise amount
+	return last_raise * bet_multiplier;
 }
 
 std::size_t BetMultiple::Hash() const {
@@ -129,21 +158,45 @@ std::size_t BetMultiple::Hash() const {
 	return seed;
 }
 
+bool BetMultiple::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
+	if (bet_multiplier == 1) {
+		// if the bet multiplier is 1, then the bet is terminal
+		return true;
+	} else {
+		// if the bet multiplier is not 1, then the bet is not terminal
+		return false;
+	}
+}
+
 // BetAllIn
 
 bool BetAllIn::IsLegal(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// all-in is always legal unless the player is already all-in
-	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
+	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+
+	int curr_player_stack = (GetPlayer() == 1) 
+		? p1_stack_depth - p1_bet 
+		: p2_stack_depth - p2_bet;
+		
 	return curr_player_stack > 0;
 }
 
 double BetAllIn::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
 	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// all-in bet is the player's remaining stack
-	return (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
+	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+	
+	double remaining_stack = (GetPlayer() == 1) 
+		? p1_stack_depth - p1_bet 
+		: p2_stack_depth - p2_bet;
+		
+	return remaining_stack;
 }
 
 std::size_t BetAllIn::Hash() const {
 	return std::hash<int>{}(GetPlayer());
+}
+
+bool BetAllIn::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
+	// all-in bet is not terminal
+	return false;
 }

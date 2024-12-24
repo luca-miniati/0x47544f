@@ -52,6 +52,8 @@ public:
 	 */
 	[[nodiscard]] virtual std::size_t Hash() const = 0;
 
+	[[nodiscard]] virtual bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const = 0;
+
 	// Static Factory methods
 	static std::shared_ptr<PreflopAction> Fold(int player);
 	static std::shared_ptr<PreflopAction> Check(int player);
@@ -71,6 +73,8 @@ public:
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 
 	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 };
 
 class Check final : public PreflopAction {
@@ -84,6 +88,8 @@ public:
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 
 	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 };
 
 class BetProportionPot final : public PreflopAction {
@@ -98,6 +104,8 @@ public:
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 
 	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 };
 
 class BetMultiple final : public PreflopAction {
@@ -112,6 +120,8 @@ public:
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 
 	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 };
 
 class BetAllIn final : public PreflopAction {
@@ -125,6 +135,8 @@ public:
 		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 
 	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
 };
 
 #endif //PREFLOP_ACTION_H

@@ -113,3 +113,9 @@ std::size_t Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
     seed ^= value + kMagic + (seed << 6) + (seed >> 2);
     return seed;
 }
+
+double Utils::ComputeMinimumRaise(const double p1_bet, const double p2_bet,
+    const std::vector<std::shared_ptr<PreflopAction>>& history) {
+    double current_max_bet = std::max(p1_bet, p2_bet);
+    return current_max_bet * 2;
+}

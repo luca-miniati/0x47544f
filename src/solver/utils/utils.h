@@ -40,6 +40,10 @@ public:
 
     // Helper to combine hashes
     static std::size_t HashCombine(std::size_t& seed, const std::size_t& value);
+
+    // Compute minimum raise
+    static double ComputeMinimumRaise(const double p1_bet, const double p2_bet,
+        const std::vector<std::shared_ptr<PreflopAction>>& history);
 };
 
 #endif
