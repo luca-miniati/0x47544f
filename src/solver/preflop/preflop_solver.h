@@ -38,14 +38,15 @@ public:
 	/**
 	 * Train the solver for a given number of iterations.
 	 * @param num_iterations the number of iterations to train the solver
+	 * @param output whether to output training logs
 	 */
-	void train(int num_iterations);
+	void train(int num_iterations, bool output = false);
 
 	/**
 	 * Returns the solution.
 	 * @return a Range object representing the current strategy of the solver
 	 */
-	[[nodiscard]] Range get_range() const;
+	[[nodiscard]] Range get_range(int player) const;
 };
 
 
