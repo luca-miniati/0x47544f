@@ -1,0 +1,56 @@
+[
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o src/CMakeFiles/eval_lib.dir/solver/eval/eval.cc.o -c /Users/marvingandhi/0x47544f/src/solver/eval/eval.cc",
+  "file": "/Users/marvingandhi/0x47544f/src/solver/eval/eval.cc",
+  "output": "src/CMakeFiles/eval_lib.dir/solver/eval/eval.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o src/CMakeFiles/eval_lib.dir/solver/preflop/preflop_solver.cc.o -c /Users/marvingandhi/0x47544f/src/solver/preflop/preflop_solver.cc",
+  "file": "/Users/marvingandhi/0x47544f/src/solver/preflop/preflop_solver.cc",
+  "output": "src/CMakeFiles/eval_lib.dir/solver/preflop/preflop_solver.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o src/CMakeFiles/eval_lib.dir/solver/preflop/preflop_action/preflop_action.cc.o -c /Users/marvingandhi/0x47544f/src/solver/preflop/preflop_action/preflop_action.cc",
+  "file": "/Users/marvingandhi/0x47544f/src/solver/preflop/preflop_action/preflop_action.cc",
+  "output": "src/CMakeFiles/eval_lib.dir/solver/preflop/preflop_action/preflop_action.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o src/CMakeFiles/eval_lib.dir/solver/preflop/range/range.cc.o -c /Users/marvingandhi/0x47544f/src/solver/preflop/range/range.cc",
+  "file": "/Users/marvingandhi/0x47544f/src/solver/preflop/range/range.cc",
+  "output": "src/CMakeFiles/eval_lib.dir/solver/preflop/range/range.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o src/CMakeFiles/utils_lib.dir/solver/utils/utils.cc.o -c /Users/marvingandhi/0x47544f/src/solver/utils/utils.cc",
+  "file": "/Users/marvingandhi/0x47544f/src/solver/utils/utils.cc",
+  "output": "src/CMakeFiles/utils_lib.dir/solver/utils/utils.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o src/CMakeFiles/preflop_lib.dir/solver/preflop/node/node.cc.o -c /Users/marvingandhi/0x47544f/src/solver/preflop/node/node.cc",
+  "file": "/Users/marvingandhi/0x47544f/src/solver/preflop/node/node.cc",
+  "output": "src/CMakeFiles/preflop_lib.dir/solver/preflop/node/node.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o test/CMakeFiles/TestEval.dir/solver/eval/test_eval.cc.o -c /Users/marvingandhi/0x47544f/test/solver/eval/test_eval.cc",
+  "file": "/Users/marvingandhi/0x47544f/test/solver/eval/test_eval.cc",
+  "output": "test/CMakeFiles/TestEval.dir/solver/eval/test_eval.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o test/CMakeFiles/TestUtils.dir/solver/utils/test_utils.cc.o -c /Users/marvingandhi/0x47544f/test/solver/utils/test_utils.cc",
+  "file": "/Users/marvingandhi/0x47544f/test/solver/utils/test_utils.cc",
+  "output": "test/CMakeFiles/TestUtils.dir/solver/utils/test_utils.cc.o"
+},
+{
+  "directory": "/Users/marvingandhi/0x47544f/build",
+  "command": "/usr/bin/clang++ -I/Users/marvingandhi/0x47544f/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -o test/CMakeFiles/TestPreflop.dir/solver/preflop/node/test_node.cc.o -c /Users/marvingandhi/0x47544f/test/solver/preflop/node/test_node.cc",
+  "file": "/Users/marvingandhi/0x47544f/test/solver/preflop/node/test_node.cc",
+  "output": "test/CMakeFiles/TestPreflop.dir/solver/preflop/node/test_node.cc.o"
+}
+]
