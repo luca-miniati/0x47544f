@@ -5,9 +5,6 @@
 #include "solver/preflop/preflop_solver.h"
 
 class Utils {
-    // Helper to combine hashes
-    static void HashCombine(std::size_t& seed, const std::size_t& value);
-
 public:
     static constexpr u32 CARD_BITMASK = 536805376;
     static constexpr u32 CARD_SUIT = 61440;
@@ -41,6 +38,12 @@ public:
     static std::size_t HashState(u32 c1, u32 c2,
         const std::vector<std::shared_ptr<PreflopAction>>& history);
 
+    // Helper to combine hashes
+    static std::size_t HashCombine(std::size_t& seed, const std::size_t& value);
+
+    // Compute minimum raise
+    static double ComputeMinimumRaise(const double p1_bet, const double p2_bet,
+        const std::vector<std::shared_ptr<PreflopAction>>& history);
 };
 
 #endif
