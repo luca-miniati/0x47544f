@@ -4,7 +4,7 @@
 #include <iostream>
 #include <random>
 
-u32 Utils::ParseCard(const std::string& card_string) {
+u32 Utils::ParseCard(const std::string &card_string) {
     static const std::unordered_map<char, int> char_to_rank_index = {
         {'A', 12}, {'K', 11}, {'Q', 10}, {'J', 9}, {'T', 8}, {'9', 7},
         {'8', 6}, {'7', 5}, {'6', 4}, {'5', 3}, {'4', 2}, {'3', 1}, {'2', 0}
@@ -24,14 +24,14 @@ u32 Utils::ParseCard(const std::string& card_string) {
     const int rank_index = char_to_rank_index.at(card_string[0]);
     const int suit_index = char_to_suit_index.at(card_string[1]);
 
-    card |= 1 << rank_index + 16;
+    card |= 1 << (rank_index + 16);
     card |= PRIMES[rank_index];
-    card |= 1 << suit_index + 12;
+    card |= 1 << (suit_index + 12);
 
     return card;
 }
 
-std::vector<u32> Utils::ParseCards(const std::string& cards_string) {
+std::vector<u32> Utils::ParseCards(const std::string &cards_string) {
     std::vector<u32> cards(cards_string.length() / 2);
 
     for (int i = 0; i < cards_string.length() / 2; ++i)
@@ -70,51 +70,27 @@ std::vector<u32> Utils::MakeDeck() {
     return deck;
 }
 
-void Utils::Shuffle(std::vector<u32>& deck) {
+void Utils::Shuffle(std::vector<u32> &deck) {
     auto rd = std::random_device();
     auto rng = std::default_random_engine(rd());
     std::ranges::shuffle(deck, rng);
 }
 
-std::pair<double, double> Utils::ComputeOutstandingBets(const int p1_stack_depth,
-    const int p2_stack_depth, const std::vector<std::shared_ptr<PreflopAction>>& history) {
-    double p1 = 0.5, p2 = 1;
-
-    for (auto& action : history) {
-        if (action->GetPlayer() == 1)
-            p1 += action->GetBetAmount(p1_stack_depth, p2_stack_depth,
-                                       history);
-        else
-            p2 += action->GetBetAmount(p1_stack_depth, p2_stack_depth,
-                                       history);
-    }
-
-    return std::make_pair(p1, p2);
-}
-
 std::size_t Utils::HashState(const u32 c1, const u32 c2,
-    const std::vector<std::shared_ptr<PreflopAction>>& history) {
+                             const std::vector<std::shared_ptr<PreflopAction> > &history) {
     std::size_t seed = 0;
     // hash c1 and c2
-    std::size_t val = std::hash<u32>{}(c1);
-    HashCombine(seed, val);
-    val = std::hash<u32>{}(c2);
-    seed = HashCombine(seed, val);
+    HashCombine(seed, std::hash<u32>{}(c1));
+    HashCombine(seed, std::hash<u32>{}(c2));
     // hash actions
-    for (auto& action : history) {
+    for (auto &action: history) {
         std::size_t element_hash = action->Hash();
-        seed = HashCombine(seed, element_hash);
+        HashCombine(seed, element_hash);
     }
     return seed;
 }
 
-std::size_t Utils::HashCombine(std::size_t& seed, const std::size_t& value) {
+void Utils::HashCombine(std::size_t &seed, const std::size_t &value) {
     constexpr std::size_t kMagic = 0x9e3779b97f4a7c16ULL;
     seed ^= value + kMagic + (seed << 6) + (seed >> 2);
-    return seed;
-}
-
-double Utils::ComputeMinimumRaise(const double p1_bet, const double p2_bet,
-    const std::vector<std::shared_ptr<PreflopAction>>& history) {
-    return (std::max(p1_bet, p2_bet) - std::min(p1_bet, p2_bet)) * 2;
 }

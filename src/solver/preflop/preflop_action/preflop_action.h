@@ -7,44 +7,33 @@
 
 #include <vector>
 
+#include "solver/preflop/game_state/game_state.h"
+
+struct GameState;
+
 class PreflopAction {
-	int player;
 public:
-	explicit PreflopAction(int player);
+	explicit PreflopAction();
 
 	virtual ~PreflopAction() = default;
 
 	/**
-	 * Gets the player to move.
-	 * @return the player who can play this action
-	 */
-	[[nodiscard]] int GetPlayer() const;
-
-	/**
 	 * Given a valid history of PreflopActions, return whether this action can be taken on the next
 	 * move.
-	 * @param p1_stack_depth starting stack depth for player 1, in chips
-	 * @param p2_stack_depth starting stack depth for player 1, in chips
-	 * @param history array of valid moves
+	 * @param state the current state of the game (not including this action)
 	 * @return whether this action is a legal move
 	 */
-	[[nodiscard]] virtual bool IsLegal(int p1_stack_depth, int p2_stack_depth,
-	                                   const std::vector<std::shared_ptr<PreflopAction>>& history
-	                                   ) const = 0;
+	[[nodiscard]] virtual bool IsLegal(GameState state) = 0;
 
 	/**
 	 * Given a valid history of PreflopActions, return the value of this bet, in big blinds. In
 	 * other words, if P is the amount this player has bet in this round of action, and P' is the
 	 * amount this player has bet after this action, then return P' - P.
 	 * For Checks and Folds, this returns 0.
-	 * @param p1_stack_depth starting stack depth for player 1, in chips
-	 * @param p2_stack_depth starting stack depth for player 1, in chips
-	 * @param history array of valid moves
+	 * @param state the current state of the game (not including this action)
 	 * @return the increase in value that this move induces
 	 */
-	[[nodiscard]] virtual double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-	                                          const std::vector<std::shared_ptr<PreflopAction>>& history
-	                                          ) const = 0;
+	[[nodiscard]] virtual double GetBetAmount(GameState state) = 0;
 
 	/**
 	 * Returns a hash of this action.
@@ -52,91 +41,100 @@ public:
 	 */
 	[[nodiscard]] virtual std::size_t Hash() const = 0;
 
-	[[nodiscard]] virtual bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const = 0;
+	/**
+	 * Returns whether this action, if played after `history`, would the betting round.
+	 * @param state the current state of the game (not including this action)
+	 * @return whether this action is terminal
+	 */
+	[[nodiscard]] virtual bool IsTerminal(GameState state) const = 0;
 
 	// Static Factory methods
-	static std::shared_ptr<PreflopAction> Fold(int player);
-	static std::shared_ptr<PreflopAction> Check(int player);
-	static std::shared_ptr<PreflopAction> BetProportionPot(int player, double bet_multiplier);
-	static std::shared_ptr<PreflopAction> BetMultiple(int player, double bet_multiplier);
-	static std::shared_ptr<PreflopAction> BetAllIn(int player);
+	static std::shared_ptr<PreflopAction> Fold();
+	static std::shared_ptr<PreflopAction> Check();
+	static std::shared_ptr<PreflopAction> Call();
+	static std::shared_ptr<PreflopAction> Bet(double pot_multiplier);
+	static std::shared_ptr<PreflopAction> Raise(double bet_multiplier);
+	static std::shared_ptr<PreflopAction> AllIn();
 };
 
 class Fold final : public PreflopAction {
 public:
-	explicit Fold(int player);
+	explicit Fold();
 
-	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsLegal(GameState state) override;
 
-	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] double GetBetAmount(GameState state) override;
 
 	[[nodiscard]] std::size_t Hash() const override;
 
-	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsTerminal(GameState state) const override;
 };
 
 class Check final : public PreflopAction {
 public:
-	explicit Check(int player);
+	explicit Check();
 
-	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsLegal(GameState state) override;
 
-	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] double GetBetAmount(GameState state) override;
 
 	[[nodiscard]] std::size_t Hash() const override;
 
-	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsTerminal(GameState state) const override;
 };
 
-class BetProportionPot final : public PreflopAction {
+class Call final : public PreflopAction {
+public:
+	explicit Call();
+
+	[[nodiscard]] bool IsLegal(GameState state) override;
+
+	[[nodiscard]] double GetBetAmount(GameState state) override;
+
+	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool IsTerminal(GameState state) const override;
+};
+
+class Bet final : public PreflopAction {
+	double pot_multiplier;
+public:
+	explicit Bet(double pot_multiplier);
+
+	[[nodiscard]] bool IsLegal(GameState state) override;
+
+	[[nodiscard]] double GetBetAmount(GameState state) override;
+
+	[[nodiscard]] std::size_t Hash() const override;
+
+	[[nodiscard]] bool IsTerminal(GameState state) const override;
+};
+
+class Raise final : public PreflopAction {
 	double bet_multiplier;
 public:
-	explicit BetProportionPot(int player, double bet_multiplier);
+	explicit Raise(double bet_multiplier);
 
-	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsLegal(GameState state) override;
 
-	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] double GetBetAmount(GameState state) override;
 
 	[[nodiscard]] std::size_t Hash() const override;
 
-	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsTerminal(GameState state) const override;
 };
 
-class BetMultiple final : public PreflopAction {
-	double bet_multiplier;
+class AllIn final : public PreflopAction {
 public:
-	explicit BetMultiple(int player, double bet_multiplier);
+	explicit AllIn();
 
-	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsLegal(GameState state) override;
 
-	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] double GetBetAmount(GameState state) override;
 
 	[[nodiscard]] std::size_t Hash() const override;
 
-	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-};
-
-class BetAllIn final : public PreflopAction {
-public:
-	explicit BetAllIn(int player);
-
-	[[nodiscard]] bool IsLegal(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] double GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-		const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
-
-	[[nodiscard]] std::size_t Hash() const override;
-
-	[[nodiscard]] bool isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const override;
+	[[nodiscard]] bool IsTerminal(GameState state) const override;
 };
 
 #endif //PREFLOP_ACTION_H
