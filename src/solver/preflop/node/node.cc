@@ -1,30 +1,17 @@
 #include "solver/eval/eval.h"
-#include "solver/utils/utils.h"
 #include "solver/preflop/preflop_action/preflop_action.h"
 #include "node.h"
 
-std::vector<std::shared_ptr<PreflopAction>> Node::GetActions(
-    const int p1_stack_depth, const int p2_stack_depth,
-    const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-    std::vector<std::shared_ptr<PreflopAction>> actions;
-
-    if (is_terminal)
-        return actions;
-
-    for (const auto& action : history)
-        if (action->IsLegal(p1_stack_depth, p2_stack_depth, history))
-            actions.push_back(action);
-
-    return actions;
-}
-
-Node::Node(const int p1_stack_depth, const int p2_stack_depth,
-    const std::vector<std::shared_ptr<PreflopAction>> &history) : history(history) {
-    // set is_terminal
-    is_terminal = !history.empty() && history.back()->IsTerminal(history);
-
+Node::Node(std::shared_ptr<GameState> state, const double p1_equity_multiplier,
+           const std::vector<std::shared_ptr<PreflopAction> > &action_space)
+    : state(std::move(state)) {
     // compute available actions
-    actions = GetActions(p1_stack_depth, p2_stack_depth, history);
+    actions = GetActions(action_space);
+
+    // get total bets of each player
+    auto [bet1, bet2] = state->GetTotalBets();
+    p1_bet = bet1, p2_bet = bet2;
+    this->p1_equity_multiplier = p1_equity_multiplier;
 
     // zero out all arrays
     const unsigned long num_actions = actions.size();
@@ -33,16 +20,27 @@ Node::Node(const int p1_stack_depth, const int p2_stack_depth,
     for (int a = 0; a < num_actions; ++a)
         strategy[a] = 1.0 / static_cast<double>(num_actions);
     strategy_sum.resize(num_actions);
-};
+}
 
-double Node::GetUtility(const std::vector<u32>& deck, const double p1_equity_multiplier) {
-    // this is 1 if p1 was second to last, 2 otherwise
-    const unsigned long second_to_last = 2 - (history.size() + 1) % 2;
+std::vector<std::shared_ptr<PreflopAction> > Node::GetActions(
+    const std::vector<std::shared_ptr<PreflopAction> > &action_space) const {
+    std::vector<std::shared_ptr<PreflopAction> > actions;
+
+    if (state->IsTerminal())
+        return actions;
+
+    for (const auto &action: action_space)
+        if (action->IsLegal(*state))
+            actions.push_back(action);
+
+    return actions;
+}
+
+double Node::GetUtility(const std::vector<u32> &deck) const {
     // compute the amount each player put into the pot
-    auto [p1, p2] = Utils::ComputeOutstandingBets(history);
-    if (std::dynamic_pointer_cast<Fold>(history.back()))
+    if (std::dynamic_pointer_cast<Fold>(state->history.back()))
         // p1 only realizes <p1_equity_multiplier>% of their utility
-        return second_to_last == 1 ? p2 * p1_equity_multiplier : p1;
+        return state->player_to_move == 1 ? p2_bet * p1_equity_multiplier : p1_bet;
 
     const std::vector p1_cards = {deck[0], deck[1], deck[4], deck[5], deck[6], deck[7], deck[8]};
     const std::vector p2_cards = {deck[2], deck[3], deck[4], deck[5], deck[6], deck[7], deck[8]};
@@ -51,15 +49,17 @@ double Node::GetUtility(const std::vector<u32>& deck, const double p1_equity_mul
     const int p2_rank = eval.GetBestHand(p2_cards);
 
     double showdown_multiplier;
-    if (p1_rank < p2_rank)      showdown_multiplier = 1;
+    if (p1_rank < p2_rank) showdown_multiplier = 1;
     else if (p1_rank > p2_rank) showdown_multiplier = -1;
-    else                        return 0;
+    else return 0;
 
-    double position_multiplier = second_to_last == 1 && showdown_multiplier > 0
-                                    ? p1_equity_multiplier
-                                    : 1;
+    const double position_multiplier = state->player_to_move == 1 && showdown_multiplier > 0
+                                           ? p1_equity_multiplier
+                                           : 1;
 
-    return (second_to_last == 1 ? p2 : p1) * showdown_multiplier * position_multiplier;
+    return (state->player_to_move == 1
+                ? p2_bet
+                : p1_bet) * showdown_multiplier * position_multiplier;
 }
 
 std::vector<double> Node::GetStrategy(const double p) {
@@ -91,9 +91,9 @@ std::vector<double> Node::GetAverageStrategy() const {
         norm += strategy_sum[a];
     for (int a = 0; a < num_actions; ++a) {
         if (norm > 0)
-        average_strategy[a] = strategy_sum[a] / norm;
+            average_strategy[a] = strategy_sum[a] / norm;
         else
-        average_strategy[a] = 1.0 / static_cast<double>(num_actions);
+            average_strategy[a] = 1.0 / static_cast<double>(num_actions);
     }
     return average_strategy;
 }
