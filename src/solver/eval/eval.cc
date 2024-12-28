@@ -3,6 +3,8 @@
 #include <bit>
 #include <unordered_map>
 
+// EDIT | style changes
+
 Eval::Eval() : flushes{}, straights_and_high_cards{} {
     InitLookupTables();
     InitPrimeToIndex();
@@ -35,7 +37,12 @@ void Eval::InitPrimeToIndex() {
     for (int a = 12; a >= 0; --a) {
         for (int b = 12; b >= 0; --b) {
             if (a == b) continue;
-            primes_to_index[Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[b]] = 10 + quads_cnt;
+            int prime = Utils::PRIMES[a] * 
+                        Utils::PRIMES[a] * 
+                        Utils::PRIMES[a] * 
+                        Utils::PRIMES[a] * 
+                        Utils::PRIMES[b];
+            primes_to_index[prime] = 10 + quads_cnt;
             ++quads_cnt;
         }
     }
@@ -44,7 +51,12 @@ void Eval::InitPrimeToIndex() {
     for (int a = 12; a >= 0; --a) {
         for (int b = 12; b >= 0; --b) {
             if (a == b) continue;
-            primes_to_index[Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[b] * Utils::PRIMES[b]] = 166 + boats_cnt;
+            int prime = Utils::PRIMES[a] * 
+                        Utils::PRIMES[a] * 
+                        Utils::PRIMES[a] * 
+                        Utils::PRIMES[b] * 
+                        Utils::PRIMES[b];
+            primes_to_index[prime] = 166 + boats_cnt;
             ++boats_cnt;
         }
     }
@@ -54,7 +66,12 @@ void Eval::InitPrimeToIndex() {
         for (int b = 12; b >= 0; --b) {
             for (int c = b - 1; c >= 0; --c) {
                 if (a == b || b == c || a == c) continue;
-                primes_to_index[Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[b] * Utils::PRIMES[c]] = 1609 + trips_cnt;
+                int prime = Utils::PRIMES[a] * 
+                            Utils::PRIMES[a] * 
+                            Utils::PRIMES[a] * 
+                            Utils::PRIMES[b] * 
+                            Utils::PRIMES[c];
+                primes_to_index[prime] = 1609 + trips_cnt;
                 ++trips_cnt;
             }
         }
@@ -65,7 +82,12 @@ void Eval::InitPrimeToIndex() {
         for (int b = a - 1; b >= 0; --b) {
             for (int c = 12; c >= 0; --c) {
                 if (a == b || b == c || a == c) continue;
-                primes_to_index[Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[b] * Utils::PRIMES[b] * Utils::PRIMES[c]] = 2467 + two_pairs_cnt;
+                int prime = Utils::PRIMES[a] * 
+                            Utils::PRIMES[a] * 
+                            Utils::PRIMES[b] * 
+                            Utils::PRIMES[b] * 
+                            Utils::PRIMES[c];
+                primes_to_index[prime] = 2467 + two_pairs_cnt;
                 ++two_pairs_cnt;
             }
         }
@@ -77,7 +99,12 @@ void Eval::InitPrimeToIndex() {
             for (int c = b - 1; c >= 0; --c) {
                 for (int d = c - 1; d >= 0; --d) {
                     if (a == b || a == c || a == d || b == c || b == d || c == d) continue;
-                    primes_to_index[Utils::PRIMES[a] * Utils::PRIMES[a] * Utils::PRIMES[b] * Utils::PRIMES[c] * Utils::PRIMES[d]] = 3325 + pairs_cnt;
+                    int prime = Utils::PRIMES[a] * 
+                                Utils::PRIMES[a] * 
+                                Utils::PRIMES[b] * 
+                                Utils::PRIMES[c] * 
+                                Utils::PRIMES[d];
+                    primes_to_index[prime] = 3325 + pairs_cnt;
                     ++pairs_cnt;
                 }
             }

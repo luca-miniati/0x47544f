@@ -2,6 +2,8 @@
 // Created by luca miniati on 12/26/24.
 //
 
+// EDIT | Added new functions
+
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 #include <vector>
@@ -14,10 +16,14 @@ struct GameState {
     double p1_stack_depth, p2_stack_depth;
     std::pair<double, double> pot;
     std::vector<std::shared_ptr<PreflopAction> > history;
+    double last_raise_amount;
 
-    GameState(int player_to_move, int p1_position, int p2_position, double p1_stack_depth,
-              double p2_stack_depth, std::vector<std::shared_ptr<PreflopAction> > history,
-              int max_num_raises);
+    GameState(const int player_to_move, const int p1_position, const int p2_position,
+              const double p1_stack_depth, const double p2_stack_depth,
+              std::vector<std::shared_ptr<PreflopAction>> history,
+              const int max_num_raises,
+              const std::pair<double, double>& pot,
+              const double last_raise_amount);
 
     /**
      * Return whether this is a terminal state.
@@ -51,7 +57,19 @@ struct GameState {
      * @return a double representing the amount of big blinds remaining
      */
     [[nodiscard]] double GetChipsRemaining(int player) const;
-};
 
+    /**
+     * Returns a GameState for the state before the last action.
+     * @return the previous game state
+     */
+    [[nodiscard]] GameState GetPreviousGameState() const;
+
+    /**
+     * Apply an action to the current state and return a new state.
+     * @param action the action to apply
+     * @return the new state after applying the action
+     */
+    [[nodiscard]] GameState ApplyAction(const std::shared_ptr<PreflopAction>& action) const;
+};
 
 #endif //GAME_STATE_H

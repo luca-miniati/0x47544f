@@ -2,6 +2,8 @@
 #include "solver/preflop/preflop_action/preflop_action.h"
 #include "node.h"
 
+// EDIT | use new GameState functions
+
 Node::Node(std::shared_ptr<GameState> state, const double p1_equity_multiplier,
            const std::vector<std::shared_ptr<PreflopAction> > &action_space)
     : state(std::move(state)) {
@@ -9,8 +11,9 @@ Node::Node(std::shared_ptr<GameState> state, const double p1_equity_multiplier,
     actions = GetActions(action_space);
 
     // get total bets of each player
-    auto [bet1, bet2] = state->GetTotalBets();
-    p1_bet = bet1, p2_bet = bet2;
+    auto [bet1, bet2] = state -> GetTotalBets();
+    p1_bet = bet1;
+    p2_bet = bet2;
     this->p1_equity_multiplier = p1_equity_multiplier;
 
     // zero out all arrays
@@ -42,8 +45,8 @@ double Node::GetUtility(const std::vector<u32> &deck) const {
         // p1 only realizes <p1_equity_multiplier>% of their utility
         return state->player_to_move == 1 ? p2_bet * p1_equity_multiplier : p1_bet;
 
-    const std::vector p1_cards = {deck[0], deck[1], deck[4], deck[5], deck[6], deck[7], deck[8]};
-    const std::vector p2_cards = {deck[2], deck[3], deck[4], deck[5], deck[6], deck[7], deck[8]};
+    const std::vector<u32> p1_cards = {deck[0], deck[1], deck[4], deck[5], deck[6], deck[7], deck[8]};
+    const std::vector<u32> p2_cards = {deck[2], deck[3], deck[4], deck[5], deck[6], deck[7], deck[8]};
     Eval eval;
     const int p1_rank = eval.GetBestHand(p1_cards);
     const int p2_rank = eval.GetBestHand(p2_cards);
