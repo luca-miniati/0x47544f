@@ -1,4 +1,4 @@
-# 0x47544f - Advanced Poker Solver & Visualization Suite
+# 0x47544f - GTO Poker Solver & Visualizer Suite
 
 0x47544f (hex for "GTO") is a high-performance No-Limit Hold'Em solver with real-time visualization capabilities. This project aims to be the most comprehensive open-source poker solving and training tool available.
 
