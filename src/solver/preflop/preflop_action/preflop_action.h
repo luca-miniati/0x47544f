@@ -18,17 +18,16 @@ public:
 	virtual ~PreflopAction() = default;
 
 	/**
-	 * Given a valid history of PreflopActions, return whether this action can be taken on the next
-	 * move.
+	 * Given a valid GameState, return whether this action can be taken on the next move.
 	 * @param state the current state of the game (not including this action)
 	 * @return whether this action is a legal move
 	 */
 	[[nodiscard]] virtual bool IsLegal(GameState state) = 0;
 
 	/**
-	 * Given a valid history of PreflopActions, return the value of this bet, in big blinds. In
-	 * other words, if P is the amount this player has bet in this round of action, and P' is the
-	 * amount this player has bet after this action, then return P' - P.
+	 * Given a valid GameState, return the value of this bet, in big blinds. In other words, if P
+	 * is the amount this player has bet in this round of action, and P' is the amount this player
+	 * has bet after this action, then return P' - P.
 	 * For Checks and Folds, this returns 0.
 	 * @param state the current state of the game (not including this action)
 	 * @return the increase in value that this move induces
@@ -42,11 +41,19 @@ public:
 	[[nodiscard]] virtual std::size_t Hash() const = 0;
 
 	/**
-	 * Returns whether this action, if played after `history`, would the betting round.
+	 * Given a valid GameState, return whether this action, if played on this state, would end the
+	 * betting round.
 	 * @param state the current state of the game (not including this action)
 	 * @return whether this action is terminal
 	 */
 	[[nodiscard]] virtual bool IsTerminal(GameState state) const = 0;
+
+	/**
+	 * Given a valid GameState, return the GameState that follows from playing this action.
+	 * @param state the current state of the game (not including this action)
+	 * @return a new state representing the state of the game after playing this action.
+	 */
+	[[nodiscard]] GameState NextState(const GameState &state);
 
 	// Static Factory methods
 	static std::shared_ptr<PreflopAction> Fold();

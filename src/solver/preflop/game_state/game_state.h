@@ -11,46 +11,45 @@ class PreflopAction;
 
 struct GameState {
     int player_to_move, max_num_raises, p1_position, p2_position;
-    double p1_stack_depth, p2_stack_depth;
+    double p1_stack_depth, p2_stack_depth, last_raise;
     std::pair<double, double> pot;
+    bool is_terminal, can_raise;
     std::vector<std::shared_ptr<PreflopAction> > history;
 
-    GameState(int player_to_move, int p1_position, int p2_position, double p1_stack_depth,
-              double p2_stack_depth, std::vector<std::shared_ptr<PreflopAction> > history,
+    /**
+     * Instantiates an empty history.
+     */
+    GameState::GameState(int player_to_move, int p1_position, int p2_position,
+                         double p1_stack_depth, double p2_stack_depth, double last_raise,
+                         std::pair<double, double> pot, bool is_terminal, bool can_raise,
+                         std::vector<std::shared_ptr<PreflopAction> > history, int max_num_raises);
+
+    GameState(int p1_position, int p2_position, double p1_stack_depth,
+              double p2_stack_depth, std::vector<std::shared_ptr<PreflopAction>> history,
               int max_num_raises);
-
     /**
-     * Return whether this is a terminal state.
-     * @return whether this is a terminal state
+     * Instantiates an empty history.
      */
-    [[nodiscard]] bool IsTerminal() const;
+    static GameState GameState::New(int p1_position, int p2_position,
+                                    double p1_stack_depth, double p2_stack_depth,
+                                    int max_num_raises);
 
     /**
-     * Return the total amount each player has contributed to the pot.
-     * @return a pair of doubles {p1_contribution, p2_contribution}
-     */
-    [[nodiscard]] std::pair<double, double> GetTotalBets();
-
-    /**
-     * Return the amount of the last raise that happened. If the last action wasn't a raise, this
-     * returns 0.
-     * @return a double representing the amount of the last raise
-     */
-    [[nodiscard]] double GetLastRaise() const;
-
-    /**
-     * Return whether the next action can be a raise. This can happen only if the current number of
-     * raises is less than `max_num_raises`.
-     * @return whether the next player can raise
-     */
-    [[nodiscard]] bool CanRaise() const;
-
-    /**
-     * Return the number of big blinds in `player`'s stack.
      * @param player the player whose stack to return
-     * @return a double representing the amount of big blinds remaining
+     * @return a double representing the amount of big blinds remaining in `player`'s stack
      */
     [[nodiscard]] double GetChipsRemaining(int player) const;
+
+    /**
+     * @return the index of the player position who isn't to move.
+     */
+    [[nodiscard]] int NextPlayer() const;
+
+    /**
+     * @return a copy of `action` appended to `history`.
+     */
+    [[nodiscard]] std::vector<std::shared_ptr<PreflopAction> >
+    NextHistory(std::shared_ptr<PreflopAction> action) const;
 };
 
 
