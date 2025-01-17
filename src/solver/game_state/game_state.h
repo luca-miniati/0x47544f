@@ -16,6 +16,7 @@ struct GameState {
     double last_raise = 0;
     bool is_terminal = false;
     int num_raises = 0;
+    int player_to_act;
     std::string history;
 
     /**
@@ -28,12 +29,24 @@ struct GameState {
      * @param is_terminal whether this game state is terminal (equivalently, if we're on the river
      *                    and action is closed.
      * @param num_raises the number of raises that have happened on this street.
+     * @param player_to_act the player whose turn it is.
      * @param history a string representation of the actions that have been made.
      */
     GameState(std::pair<double, double> pot, std::pair<double, double> bets, double last_raise,
-              bool is_terminal, int num_raises, std::string history);
+              bool is_terminal, int num_raises, int player_to_act, std::string history);
+
+    /**
+     * Returns a string representation of this game state in the following format:
+     *
+     * <pot>|<bets>|<last_raise>|<is_terminal>|<num_raises>|<player_to_act>|<history>
+     *
+     * e.g. "(1, 1)|(2, 0)|2|false|1|P1|b(1.0)" would represent the game state after P1 pots it on the
+     *                                     flop in a limped pot.
+     */
+    [[nodiscard]] std::string ToString() const;
 };
 
 
 
 #endif //GAME_STATE_H
+
