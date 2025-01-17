@@ -20,6 +20,8 @@ target_include_directories(utils_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(preflop_lib
         solver/preflop/node/node.cc
+        solver/game_state/game_state.cc
+        solver/game_state/game_state.h
 )
 
 target_include_directories(preflop_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

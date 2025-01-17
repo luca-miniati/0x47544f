@@ -1,14 +1,20 @@
 add_executable(
     TestEval
         solver/eval/test_eval.cc
+        ../src/solver/game_state/game_state.cc
+        ../src/solver/game_state/game_state.h
 )
 add_executable(
     TestUtils
         solver/utils/test_utils.cc
+        ../src/solver/game_state/game_state.cc
+        ../src/solver/game_state/game_state.h
 )
 add_executable(
     TestPreflop
         solver/preflop/node/test_node.cc
+        ../src/solver/game_state/game_state.cc
+        ../src/solver/game_state/game_state.h
 )
 
 target_link_libraries(
