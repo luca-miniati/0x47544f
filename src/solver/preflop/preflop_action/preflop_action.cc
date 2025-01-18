@@ -4,205 +4,204 @@
 
 #include "preflop_action.h"
 #include "../../utils/utils.h"
-#include <memory>
 
-// Constructors
-PreflopAction::PreflopAction(const int player) : player(player) {}
-Fold::Fold(const int player) : PreflopAction(player) {}
-Check::Check(const int player) : PreflopAction(player) {}
-BetProportionPot::BetProportionPot(const int player, const double bet_multiplier) : PreflopAction(player),
-bet_multiplier(bet_multiplier) {}
-BetMultiple::BetMultiple(const int player, const double bet_multiplier) : PreflopAction(player),
-bet_multiplier(bet_multiplier) {}
-BetAllIn::BetAllIn(const int player) : PreflopAction(player) {}
+PreflopAction::PreflopAction() = default;
+Fold::Fold() = default;
+Check::Check() = default;
+Call::Call() = default;
+Bet::Bet(const double pot_multiplier) : pot_multiplier(pot_multiplier) {}
+Raise::Raise(const double bet_multiplier) : bet_multiplier(bet_multiplier) {}
+AllIn::AllIn() = default;
 
 // Static Factory methods
-std::shared_ptr<PreflopAction> PreflopAction::Fold(int player) {
-	return std::make_shared<::Fold>(player);
+std::shared_ptr<PreflopAction> PreflopAction::Fold() {
+    return std::make_shared<::Fold>();
 }
-std::shared_ptr<PreflopAction> PreflopAction::Check(int player) {
-	return std::make_shared<::Check>(player);
+std::shared_ptr<PreflopAction> PreflopAction::Check() {
+    return std::make_shared<::Check>();
 }
-std::shared_ptr<PreflopAction> PreflopAction::BetProportionPot(int player, double bet_multiplier) {
-	return std::make_shared<::BetProportionPot>(player, bet_multiplier);
+std::shared_ptr<PreflopAction> PreflopAction::Call() {
+    return std::make_shared<::Call>();
 }
-std::shared_ptr<PreflopAction> PreflopAction::BetMultiple(int player, double bet_multiplier) {
-	return std::make_shared<::BetMultiple>(player, bet_multiplier);
+std::shared_ptr<PreflopAction> PreflopAction::Bet(double pot_multiplier) {
+    return std::make_shared<::Bet>(pot_multiplier);
 }
-std::shared_ptr<PreflopAction> PreflopAction::BetAllIn(int player) {
-	return std::make_shared<::BetAllIn>(player);
+std::shared_ptr<PreflopAction> PreflopAction::Raise(double bet_multiplier) {
+    return std::make_shared<::Raise>(bet_multiplier);
 }
-
-int PreflopAction::GetPlayer() const {
-	return player;
-}
-
-// Implementation
-
-// Fold
-
-bool Fold::IsLegal(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// folding is legal only if there's an outstanding bet to respond to
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	
-	if (GetPlayer() == 1) {
-		// p1 can fold only if p2 has made a higher bet
-		return p2_bet > p1_bet;
-	} else {
-		// p2 can fold only if p1 has made a higher bet
-		return p1_bet > p2_bet;
-	}
+std::shared_ptr<PreflopAction> PreflopAction::AllIn() {
+    return std::make_shared<::AllIn>();
 }
 
-double Fold::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// folding does not require any bet
-	return 0.0;
+// PreflopAction::Fold methods
+bool Fold::IsLegal(GameState state) {
+    if (state.IsTerminal())
+        return false;
+
+    // folding is legal only if there's an outstanding bet to respond to
+    auto [p1_bet, p2_bet] = state.GetTotalBets();
+
+    // players can fold only if the other player has made a higher bet
+    return state.player_to_move == 1 ? p2_bet > p1_bet : p1_bet > p2_bet;
+}
+
+double Fold::GetBetAmount(GameState state) {
+    // folding does not require any bet
+    return 0.0;
 }
 
 std::size_t Fold::Hash() const {
-	return std::hash<int>{}(GetPlayer());
+    return 1;
 }
 
-bool Fold::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// folding is always terminal
-	return true;
+bool Fold::IsTerminal(GameState state) const {
+    // folding is always terminal
+    return true;
 }
 
-// Check
+// PreflopAction::Check methods
+bool Check::IsLegal(GameState state) {
+    if (state.IsTerminal())
+        return false;
 
-bool Check::IsLegal(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// checking is legal only if there is no outstanding bet to call
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	return p1_bet == p2_bet;
+    // checking is legal only if there is no outstanding bet to call
+    auto [p1_bet, p2_bet] = state.GetTotalBets();
+    return p1_bet == p2_bet;
 }
 
-double Check::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// checking does not involve any bet
-	return 0.0;
-}	
+double Check::GetBetAmount(GameState state) {
+    return 0.0;
+}
 
 std::size_t Check::Hash() const {
-	return std::hash<int>{}(GetPlayer());
+    return 2;
 }
 
-bool Check::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// in preflop, heads-up, checking is terminal
-	return true;
+bool Check::IsTerminal(GameState state) const {
+    // a check always closes action preflop heads-up
+    return true;
 }
 
-// BetProportionPot
+// PreflopAction::Call methods
+bool Call::IsLegal(GameState state) {
+    if (state.IsTerminal())
+        return false;
 
-bool BetProportionPot::IsLegal(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
-	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
-	double min_raise = Utils::ComputeMinimumRaise(p1_bet, p2_bet, history);
-	
-	// a valid bet must be at least the minimum raise and within the player's stack
-	return (req_amount >= min_raise) && (req_amount <= curr_player_stack);
+    auto [p1_bet, p2_bet] = state.GetTotalBets();
+    // call is legal only if there is an outstanding bet
+    return p1_bet != p2_bet;
 }
 
-double BetProportionPot::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// calculate the current pot
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	double pot = p1_bet + p2_bet;
-	// bet is a proportion of the pot
-	return pot * bet_multiplier;
+double Call::GetBetAmount(GameState state) {
+    const auto [p1_bet, p2_bet] = state.GetTotalBets();
+    // call amount is always outstanding bet amount
+    return abs(p1_bet - p2_bet);
 }
 
-std::size_t BetProportionPot::Hash() const {
-	std::size_t seed = std::hash<int>{}(GetPlayer());
-	Utils::HashCombine(seed, std::hash<double>{}(bet_multiplier));
-	return seed;
+std::size_t Call::Hash() const {
+    return 3;
 }
 
-bool BetProportionPot::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// in preflop, heads-up, betting is not terminal
-	return false;
+bool Call::IsTerminal(const GameState state) const {
+    // a call always closes action preflop heads-up unless it's p1 limping
+    return !state.history.empty();
 }
 
-// BetMultiple
+// PreflopAction::Bet methods
+bool Bet::IsLegal(GameState state) {
+    if (state.IsTerminal() || !state.CanRaise())
+        return false;
 
-bool BetMultiple::IsLegal(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+    const double chips_remaining = state.GetChipsRemaining(state.player_to_move);
+    const double last_raise = state.GetLastRaise();
+    const double bet_amount = GetBetAmount(state);
 
-	if (p1_bet == p2_bet || (bet_multiplier > 1 && bet_multiplier < 2) || bet_multiplier < 1) { 
-		return false;
-	}
-
-	double req_amount = GetBetAmount(p1_stack_depth, p2_stack_depth, history);
-	int curr_player_stack = (GetPlayer() == 1) ? p1_stack_depth : p2_stack_depth;
-
-	return req_amount <= curr_player_stack || 
-		   (std::max(p1_bet, p2_bet) >= curr_player_stack && bet_multiplier == 1);
+    return bet_amount >= 2.0 * last_raise // must raise at least 2x
+           && bet_amount <= chips_remaining; // must have the chips
 }
 
-double BetMultiple::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// Get current outstanding bets
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	
-	// find the last raise amount
-	double curr_bet = std::max(p1_bet, p2_bet);
-	double prev_bet = std::min(p1_bet, p2_bet);
-	double last_raise = curr_bet - prev_bet;
-	
-	// bet is a multiple of the last raise amount
-	return last_raise * bet_multiplier;
+double Bet::GetBetAmount(GameState state) {
+    // calculate the current pot
+    auto [p1_bet, p2_bet] = state.GetTotalBets();
+
+    // bet is a proportion of the pot
+    return (p1_bet + p2_bet) * pot_multiplier;
 }
 
-std::size_t BetMultiple::Hash() const {
-	std::size_t seed = std::hash<int>{}(GetPlayer());
-	Utils::HashCombine(seed, std::hash<double>{}(bet_multiplier));
-	return seed;
+std::size_t Bet::Hash() const {
+    std::size_t seed = 4;
+    Utils::HashCombine(seed, std::hash<double>{}(pot_multiplier));
+    return seed;
 }
 
-bool BetMultiple::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	if (bet_multiplier == 1) {
-		// if the bet multiplier is 1, then the bet is terminal
-		return true;
-	} else {
-		// if the bet multiplier is not 1, then the bet is not terminal
-		return false;
-	}
+bool Bet::IsTerminal(GameState state) const {
+    // betting a proportion of the pot never closes action
+    return false;
 }
 
-// BetAllIn
+// PreflopAction::Raise methods
+bool Raise::IsLegal(GameState state) {
+    if (state.IsTerminal() || !state.CanRaise())
+        return false;
 
-bool BetAllIn::IsLegal(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
+    const double chips_remaining_1 = state.GetChipsRemaining(1);
+    const double chips_remaining_2 = state.GetChipsRemaining(2);
+    const double last_raise = state.GetLastRaise();
 
-	int curr_player_stack = (GetPlayer() == 1) 
-		? p1_stack_depth - p1_bet 
-		: p2_stack_depth - p2_bet;
-		
-	return curr_player_stack > 0;
+    // this is a legal action if there was a previous bet,
+    // and if the raise doesn't put either player all-in (if this is the case, AllIn should be used)
+    return last_raise > 0
+           && std::min(chips_remaining_1, chips_remaining_2) > bet_multiplier * last_raise;
 }
 
-double BetAllIn::GetBetAmount(int p1_stack_depth, int p2_stack_depth,
-	const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	auto [p1_bet, p2_bet] = Utils::ComputeOutstandingBets(p1_stack_depth, p2_stack_depth, history);
-	
-	double remaining_stack = (GetPlayer() == 1) 
-		? p1_stack_depth - p1_bet 
-		: p2_stack_depth - p2_bet;
-		
-	return remaining_stack;
+double Raise::GetBetAmount(GameState state) {
+    const double last_raise = state.GetPreviousGameState().GetLastRaise();
+
+    // if it's small blind open, they already have 0.5bb in
+    if ((state.player_to_move == 1 && state.p1_position == 0)
+        || (state.player_to_move == 2 && state.p2_position == 0))
+        return last_raise * bet_multiplier - 0.5;
+    // if it's big blind open, they already have 1bb in
+    if ((state.player_to_move == 1 && state.p1_position == 1)
+        || (state.player_to_move == 2 && state.p2_position == 1))
+        return last_raise * bet_multiplier - 1;
+
+    // raise is a multiple of the last raise amount
+    return last_raise * bet_multiplier;
 }
 
-std::size_t BetAllIn::Hash() const {
-	return std::hash<int>{}(GetPlayer());
+std::size_t Raise::Hash() const {
+    std::size_t seed = 5;
+    Utils::HashCombine(seed, std::hash<double>{}(bet_multiplier));
+    return seed;
 }
 
-bool BetAllIn::isTerminal(const std::vector<std::shared_ptr<PreflopAction>>& history) const {
-	// all-in bet is not terminal
-	return false;
+bool Raise::IsTerminal(const GameState state) const {
+    // a raise always re-opens action
+    return false;
+}
+
+// PreflopAction::AllIn methods
+bool AllIn::IsLegal(GameState state) {
+    if (state.IsTerminal() || !state.CanRaise())
+        return false;
+
+    const double chips_remaining = state.GetChipsRemaining(state.player_to_move);
+    return chips_remaining > 0;
+}
+
+double AllIn::GetBetAmount(GameState state) {
+    const double chips_remaining_1 = state.GetChipsRemaining(1);
+    const double chips_remaining_2 = state.GetChipsRemaining(2);
+    // all in always is just the effective stack
+    return std::min(chips_remaining_1, chips_remaining_2);
+}
+
+std::size_t AllIn::Hash() const {
+    return 6;
+}
+
+bool AllIn::IsTerminal(GameState state) const {
+    // all-in bet is never terminal (calling an all-in bet would be a Call)
+    return false;
 }

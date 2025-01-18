@@ -6,22 +6,28 @@
 
 // Node in NLHE
 class Node {
-    // History of actions resulting in this state
-    std::vector<std::shared_ptr<PreflopAction>> history;
+    std::shared_ptr<GameState> state;
     std::vector<double> strategy, strategy_sum, regret_sum;
 
-    // Given a history of actions, return the actions that can be taken in this state
-    std::vector<std::shared_ptr<PreflopAction>> GetActions(const std::vector<std::shared_ptr<PreflopAction>>& history) const;
-public:
-    // Actions available in this state
-    std::vector<std::shared_ptr<PreflopAction>> actions;
-    bool is_terminal;
+    double p1_bet, p2_bet, p1_equity_multiplier;
 
-    explicit Node(const std::vector<std::shared_ptr<PreflopAction>> &history);
+    // Actions available in this state
+    std::vector<std::shared_ptr<PreflopAction> > actions;
+
+    /**
+     * Given a history of actions, return the actions that can be taken in this state
+     * @return array of legal actions that can be played at this node
+     */
+    [[nodiscard]] std::vector<std::shared_ptr<PreflopAction> > GetActions(
+        const std::vector<std::shared_ptr<PreflopAction> >& action_space) const;
+
+public:
+    Node(std::shared_ptr<GameState> state, double p1_equity_multiplier,
+         const std::vector<std::shared_ptr<PreflopAction> >& action_space);
 
     // If this node is terminal, return utility of
     // this node to second-to-last player to act
-    double GetUtility(const std::vector<u32>& deck);
+    [[nodiscard]] double GetUtility(const std::vector<u32> &deck) const;
 
     // Update strategy using regret matching, using p as the reach probability
     // of being in this state
@@ -31,7 +37,7 @@ public:
     void UpdateRegret(int a, double v);
 
     // Return computed strategy at this node
-    std::vector<double> GetAverageStrategy() const;
+    [[nodiscard]] std::vector<double> GetAverageStrategy() const;
 };
 
 #endif
