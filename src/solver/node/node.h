@@ -2,7 +2,7 @@
 #define NODE_H
 
 #include "solver/eval/eval.h"
-#include "solver/preflop/preflop_solver.h"
+#include "../utils/preflop_solver.h"
 
 // Node in NLHE
 class Node {
