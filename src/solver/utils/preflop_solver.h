@@ -5,7 +5,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 #include <vector>
-#include "preflop_action/preflop_action.h"
+#include "../preflop/preflop_action/preflop_action.h"
 #include "range/range.h"
 
 /**

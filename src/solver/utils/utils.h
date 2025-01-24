@@ -2,7 +2,7 @@
 #define UTILS_H
 
 #include "solver/eval/eval.h"
-#include "solver/preflop/preflop_solver.h"
+#include "preflop_solver.h"
 
 class Utils {
 public:
