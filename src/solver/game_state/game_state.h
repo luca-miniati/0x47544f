@@ -6,13 +6,11 @@
 #define GAME_STATE_H
 #include <string>
 
-
-
 /**
  * Represents the state of a game of No-Limit Texas Hold'Em.
  */
 struct GameState {
-    std::pair<double, double> pot = {0, 0}, bets = {0, 0};
+    std::pair<double, double> pot = {0, 0}, stack, bets = {0, 0};
     double last_raise = 0;
     bool is_terminal = false;
     int num_raises = 0;
@@ -32,8 +30,8 @@ struct GameState {
      * @param player_to_act the player whose turn it is.
      * @param history a string representation of the actions that have been made.
      */
-    GameState(std::pair<double, double> pot, std::pair<double, double> bets, double last_raise,
-              bool is_terminal, int num_raises, int player_to_act, std::string history);
+    GameState(std::pair<double, double> pot, std::pair<double, double> stack, std::pair<double, double> bets,
+              double last_raise, bool is_terminal, int num_raises, int player_to_act, std::string history);
 
     /**
      * Returns a string representation of this game state in the following format:
@@ -45,8 +43,6 @@ struct GameState {
      */
     [[nodiscard]] std::string ToString() const;
 };
-
-
 
 #endif //GAME_STATE_H
 
